@@ -1,8 +1,11 @@
 require("dotenv").config();
+const crypto = require("crypto");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const Token = require("../models/tokenModel");
+const sendEmail = require("../utils/sendEmail");
 
 module.exports.signup = async (req, res) => {
   try {
@@ -119,20 +122,51 @@ module.exports.changePassword = async (req, res) => {
   }
 };
 
+module.exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    res.send("user doesn't exist");
+  }
+  console.log(user)
+  let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+  console.log(resetToken);
 
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-module.exports.logStatus = async (req, res) => {
+  // Save Token to DB
+  await new Token({
+    userId: user._id,
+    token: hashedToken,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
+  }).save();
+  const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+
+  const message = `
+  <h2>Hello ${user.name}</h2>
+  <p>Please use the url below to reset your password</p>  
+  <p>This reset link is valid for only 30minutes.</p>
+
+  <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+
+  <p>Regards...</p>
+  <p>Pinvent Team</p>
+`;
+  const subject = "Password Reset Request";
+  const send_to = user.email;
+  console.log(send_to)
+  const sent_from = process.env.EMAIL_USER;
+  console.log(sent_from)
+
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.json({ message: false });
-    }
-    const valid = await jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
-    if (valid) {
-      return res.json({ message: true });
-    } else return res.json({ message: false });
-  } catch (err) {
-    res.json({ message: err.message });
+    await sendEmail(subject, message, send_to, sent_from);
+    res.status(200).json({ success: true, message: "Reset Email Sent" });
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 };
 
@@ -165,8 +199,7 @@ module.exports.verifyUser = async (req, res) => {
     }
     user.verification_status = "verified";
     await user.save();
-    return res.json(user );
-
+    return res.json(user);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -185,8 +218,7 @@ module.exports.banUser = async (req, res) => {
     }
     user.verification_status = "banned";
     await user.save();
-    return res.json(user );
-
+    return res.json(user);
   } catch (err) {
     res.json({ message: err.message });
   }
