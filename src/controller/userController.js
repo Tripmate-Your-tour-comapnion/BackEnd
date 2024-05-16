@@ -6,12 +6,16 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Token = require("../models/tokenModel");
 const sendEmail = require("../utils/sendEmail");
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 module.exports.signup = async (req, res) => {
   try {
     const { full_name, email, password, re_password, role } = req.body;
     if (!full_name || !email || !password || !re_password || !role) {
       return res.status(400).json({ message: "all fields are required" });
+    }
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email address" });
     }
     if (password != re_password) {
       return res.status(400).json({ message: "password mismatch" });
@@ -124,6 +128,9 @@ module.exports.changePassword = async (req, res) => {
 
 module.exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
   const user = await User.findOne({ email: email });
   if (!user) {
     res.send("user doesn't exist");
@@ -159,7 +166,7 @@ module.exports.forgotPassword = async (req, res) => {
   <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
 
   <p>Regards...</p>
-  <p>Pinvent Team</p>
+  <p>Tripmate Team</p>
 `;
   const subject = "Password Reset Request";
   const send_to = user.email;
@@ -174,6 +181,7 @@ module.exports.forgotPassword = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
 module.exports.resetPassword = async (req, res) => {
   const { password, re_password } = req.body;
   const { resetToken } = req.params;
@@ -221,9 +229,6 @@ module.exports.userInfo = async (req, res) => {
   }
 };
 
-
-//see user
-
 module.exports.verifyUser = async (req, res) => {
   try {
     const { role } = req.user;
@@ -257,6 +262,17 @@ module.exports.banUser = async (req, res) => {
     user.verification_status = "banned";
     await user.save();
     return res.json(user);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+module.exports.searchHotel = async (req, res) => {
+  try {
+    const { key } = req.params;
+    const hotels = await ProviderProfile.find({
+      name: { $regex: new RegExp(key, "i") },
+    });
+    res.json(hotels).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }

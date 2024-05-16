@@ -10,6 +10,7 @@ const {
   searchRoom,
   getSingleRoom,
   rateRoom,
+  getAllRoomsOfOneHotel,
 } = require("../controller/hotelRoomController");
 const { upload } = require("../middleware/multer");
 
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.get("/get-all", auth_mw, getAllRooms);
 router.get("/get-single/:id?", getSingleRoom);
+router.get("/get-all-rooms/:id", auth_mw, getAllRoomsOfOneHotel);
 router.get("/search/:key?", auth_mw, searchRoom);
 router.get("/get-my-rooms", auth_mw, getMyRooms);
 

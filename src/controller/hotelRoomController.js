@@ -38,6 +38,16 @@ module.exports.getSingleRoom = async (req, res) => {
   } catch (err) {
     res.json({ message: err.message });
   }
+  
+};
+module.exports.getAllRoomsOfOneHotel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rooms = await Room.find({owner:id});
+    res.json( rooms ).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
 };
 
 module.exports.getMyRooms = async (req, res) => {
