@@ -8,6 +8,7 @@ const {
   verifyUser,
   banUser,
   forgotPassword,
+  resetPassword,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -17,6 +18,7 @@ router.post("/signup", signup);
 router.post("/login", Login);
 router.post("/change-password", auth_mw, changePassword);
 router.post("/forgot-password", forgotPassword);
+router.put("/reset-password:resetToken ", resetPassword);
 
 router.get("/get-user-info", auth_mw, userInfo);
 router.put("/verify-user", auth_mw, verifyUser);

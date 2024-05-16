@@ -128,7 +128,12 @@ module.exports.forgotPassword = async (req, res) => {
   if (!user) {
     res.send("user doesn't exist");
   }
-  console.log(user)
+
+  let token = await Token.findOne({ userId: user._id });
+  if (token) {
+    await token.deleteOne();
+  }
+
   let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
   console.log(resetToken);
 
@@ -147,7 +152,7 @@ module.exports.forgotPassword = async (req, res) => {
   const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
 
   const message = `
-  <h2>Hello ${user.name}</h2>
+  <h2>Hello ${user.full_name}</h2>
   <p>Please use the url below to reset your password</p>  
   <p>This reset link is valid for only 30minutes.</p>
 
@@ -158,9 +163,9 @@ module.exports.forgotPassword = async (req, res) => {
 `;
   const subject = "Password Reset Request";
   const send_to = user.email;
-  console.log(send_to)
+  console.log(send_to);
   const sent_from = process.env.EMAIL_USER;
-  console.log(sent_from)
+  console.log(sent_from);
 
   try {
     await sendEmail(subject, message, send_to, sent_from);
@@ -168,6 +173,36 @@ module.exports.forgotPassword = async (req, res) => {
   } catch (error) {
     res.status(500).send(error.message);
   }
+};
+module.exports.resetPassword = async (req, res) => {
+  const { password, re_password } = req.body;
+  const { resetToken } = req.params;
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // fIND tOKEN in DB
+  const userToken = await Token.findOne({
+    token: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  });
+
+  if (!userToken) {
+    res.status(404).send("Invalid or Expired Token");
+  }
+  if (password === re_password) {
+    res.status(400).send("password mismatch");
+  }
+
+  // Find user
+  const user = await User.findOne({ _id: userToken.userId });
+  user.password = password;
+  await user.save();
+  res.status(200).json({
+    message: "Password Reset Successful, Please Login",
+  });
 };
 
 module.exports.userInfo = async (req, res) => {
