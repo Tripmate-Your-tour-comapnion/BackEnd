@@ -56,7 +56,7 @@ module.exports.getMyRooms = async (req, res) => {
 
 module.exports.createRooms = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const { room_name, room_price, room_amount, room_description } = req.body;
     const { image1, image2, image3 } = req.files;
     const image1Upload = await cloudinary.uploader.upload(image1[0].path);
@@ -79,6 +79,9 @@ module.exports.createRooms = async (req, res) => {
     if (role != "hotel manager") {
       return res.json({ message: "you are not allowed to create rooms" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to create rooms" });
+    }
     const room = {
       owner: id,
       room_name: room_name,
@@ -97,10 +100,9 @@ module.exports.createRooms = async (req, res) => {
 
 module.exports.updateRoom = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const rid = req.params.id;
-    const { room_name, room_price, room_amount, room_description } =
-      req.body;
+    const { room_name, room_price, room_amount, room_description } = req.body;
     const { image1, image2, image3 } = req.files;
     const image1Upload = await cloudinary.uploader.upload(image1[0].path);
     const Image1 = image1Upload.secure_url;
@@ -122,6 +124,9 @@ module.exports.updateRoom = async (req, res) => {
     if (role != "hotel manager") {
       return res.json({ message: "you are not allowed to update rooms" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to update rooms" });
+    }
     const room = await Room.findById(rid);
     if (room.owner != id) {
       return res.json({ message: "you are only allowed to update your rooms" });
@@ -142,10 +147,13 @@ module.exports.updateRoom = async (req, res) => {
 
 module.exports.deleteRoom = async (req, res) => {
   try {
-    const { role } = req.user;
+    const { role, status } = req.user;
     const rid = req.params.id;
     if (role != "hotel manager") {
       return res.json({ message: "you are not allowed to delete rooms" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to delete rooms" });
     }
     const room = await Room.findById(rid);
     if (room.owner != req.user.id) {

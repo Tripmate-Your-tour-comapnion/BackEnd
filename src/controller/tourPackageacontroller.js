@@ -56,7 +56,7 @@ module.exports.getMyPackages = async (req, res) => {
 
 module.exports.createPackage = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const { package_name, package_price, total_space, package_description } =
       req.body;
     const { image1, image2, image3 } = req.files;
@@ -80,6 +80,9 @@ module.exports.createPackage = async (req, res) => {
     if (role != "tour agent") {
       return res.json({ message: "you are not allowed to create Tours" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to create Tours" });
+    }
     const tour = {
       agent: id,
       package_name: package_name,
@@ -98,7 +101,7 @@ module.exports.createPackage = async (req, res) => {
 
 module.exports.updatePackage = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const pid = req.params.id;
     const { package_name, package_price, total_space, package_description } =
       req.body;
@@ -126,6 +129,9 @@ module.exports.updatePackage = async (req, res) => {
     if (role != "tour agent") {
       return res.json({ message: "you are not allowed to update Tours" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to update Tours" });
+    }
     const tour = await Tours.findById(pid);
     console.log(tour);
     if (tour.agent != id) {
@@ -134,7 +140,8 @@ module.exports.updatePackage = async (req, res) => {
     tour.package_name = package_name || tour.package_name;
     tour.image[0] = Image1 || tour.image[0];
     tour.image[1] = Image2 || tour.image[1];
-    tour.image[2] = Image3 || tour.image[2];    tour.package_description = package_description || tour.package_description;
+    tour.image[2] = Image3 || tour.image[2];
+    tour.package_description = package_description || tour.package_description;
     tour.package_price = package_price || tour.package_price;
     tour.total_space = total_space || tour.total_space;
     await tour.save();
@@ -146,10 +153,13 @@ module.exports.updatePackage = async (req, res) => {
 
 module.exports.deletePackage = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const pid = req.params.id;
     if (role != "tour agent") {
       return res.json({ message: "you are not allowed to delete Tours" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to delete Tours" });
     }
     const tour = await Tours.findById(pid);
     if (tour.agent != id) {

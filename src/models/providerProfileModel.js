@@ -28,10 +28,6 @@ const userProfieSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  verification_status: {
-    type: String,
-    default: "pending",
-  },
   payment_info: {
     acc_name: {
       type: String,

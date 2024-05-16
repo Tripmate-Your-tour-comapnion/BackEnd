@@ -22,9 +22,12 @@ module.exports.getAllReservations = async (req, res) => {
 
 module.exports.getMyReservations = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     if (role != "hotel manager") {
       return res.json({ message: "you are not allowed to see reservations" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to see reservations" });
     }
     const reservations = await Reservations.find({ hotel: id });
     res.json({ message: reservations }).status(200);
@@ -36,7 +39,7 @@ module.exports.getMyReservations = async (req, res) => {
 module.exports.reserveRoom = async (req, res, next) => {
   const tx_ref = await chapa.generateTransactionReference();
   try {
-    const { role, id } = req.user;
+    const { role, id,  } = req.user;
     const { rid, quantity, from, to } = req.body;
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to reserve room" });

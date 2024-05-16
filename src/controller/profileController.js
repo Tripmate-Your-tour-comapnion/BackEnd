@@ -91,7 +91,6 @@ module.exports.providerCredential = async (req, res) => {
 module.exports.touristCredential = async (req, res) => {
   try {
     const { id } = req.user;
-
     const { passport_id, phone_number } = req.body;
     const profile_image  = req.files;
     // Should log file object if uploaded

@@ -22,9 +22,12 @@ module.exports.getAllPurchases = async (req, res) => {
 
 module.exports.getMyPurchases = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id ,status } = req.user;
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to see purchases" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to see purchases" });
     }
     const purchases = await Purchase.find({ shop: id });
     res.json(purchases).status(200);

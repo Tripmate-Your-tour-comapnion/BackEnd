@@ -22,9 +22,12 @@ module.exports.getAllSubscriptions = async (req, res) => {
 
 module.exports.getMySubscriptions = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     if (role != "tour agent") {
       return res.json({ message: "you are not allowed to see Subscriptions" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to see Subscriptions" });
     }
     const Subscriptions = await Subscriptions.find({ agency: id });
     res.json({ message: Subscriptions }).status(200);
@@ -58,7 +61,7 @@ module.exports.subscribePackage = async (req, res, next) => {
     };
     await Subscriptions.create(subscription);
     const info = {
-      type: 'tour',
+      type: "tour",
       owner: tour.agent,
       item: tid,
       id: id,
@@ -72,18 +75,6 @@ module.exports.subscribePackage = async (req, res, next) => {
     res.json({ message: err.message });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 // module.exports.confirmPayment = async (req, res) => {
 //   try {

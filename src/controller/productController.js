@@ -28,7 +28,7 @@ module.exports.searchProduct = async (req, res) => {
   try {
     const { role } = req.user;
     const { key } = req.params;
-    if (role != "shop owner") {
+    if (role != "tourist") {
       return res.json({ message: "you are not allowed to see product" });
     }
     const products = await Product.find({
@@ -61,7 +61,7 @@ module.exports.createProducts = async (req, res) => {
     //   const errorMessage = error.details[0].message;
     //   return res.status(400).send(errorMessage);
     // }
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const {
       product_name,
       product_description,
@@ -89,6 +89,9 @@ module.exports.createProducts = async (req, res) => {
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to create shops" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to create shops" });
+    }
     const product = {
       shop_owner: id,
       product_name: product_name,
@@ -107,7 +110,7 @@ module.exports.createProducts = async (req, res) => {
 
 module.exports.updateProduct = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id, status } = req.user;
     const pid = req.params.id;
     const {
       product_name,
@@ -136,6 +139,9 @@ module.exports.updateProduct = async (req, res) => {
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to update products" });
     }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to update products" });
+    }
     const product = await Product.findById(pid);
     if (!product) return res.status(404).send("product not found");
     if (product.shop_owner != id) {
@@ -162,10 +168,13 @@ module.exports.updateProduct = async (req, res) => {
 
 module.exports.deleteProduct = async (req, res) => {
   try {
-    const { role, id } = req.user;
+    const { role, id,status } = req.user;
     const pid = req.params.id;
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to delete product" });
+    }
+    if (status != "verified") {
+      return res.json({ message: "you must be verified to delete product" });
     }
     const product = await Product.findById(pid);
     if (!product) return res.status(404).send("product not found");

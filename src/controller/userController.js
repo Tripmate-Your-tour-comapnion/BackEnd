@@ -23,7 +23,7 @@ module.exports.signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     const token = await jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, status: user.verification_status },
       process.env.PRIVATE_SECERET_TOKEN
     );
     await user.save();
@@ -56,7 +56,7 @@ module.exports.Login = async (req, res) => {
       return res.status(400).json({ message: "invalid email or password" });
     }
     const token = await jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, status: user.verification_status },
       process.env.PRIVATE_SECERET_TOKEN
     );
     res
@@ -119,6 +119,8 @@ module.exports.changePassword = async (req, res) => {
   }
 };
 
+
+
 module.exports.logStatus = async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -140,11 +142,51 @@ module.exports.userInfo = async (req, res) => {
     if (!id) {
       return res.json({ message: "not authorized" });
     }
-    const user = await Users.findById(id);
+    const user = await User.findById(id);
     if (!user) {
       return res.json({ message: "user does not exist" });
     }
     return res.json({ message: user });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+module.exports.verifyUser = async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed verify user" });
+    }
+    const id = req.params.id;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.json({ message: "user does not exist" });
+    }
+    user.verification_status = "verified";
+    await user.save();
+    return res.json(user );
+
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+module.exports.banUser = async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed ban user" });
+    }
+    const id = req.params.id;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.json({ message: "user does not exist" });
+    }
+    user.verification_status = "banned";
+    await user.save();
+    return res.json(user );
+
   } catch (err) {
     res.json({ message: err.message });
   }
