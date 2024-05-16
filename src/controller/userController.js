@@ -154,7 +154,7 @@ module.exports.forgotPassword = async (req, res) => {
   const message = `
   <h2>Hello ${user.full_name}</h2>
   <p>Please use the url below to reset your password</p>  
-  <p>This reset link is valid for only 30minutes.</p>
+  <p>This reset link is valid for only 15 minutes.</p>
 
   <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
 
@@ -220,6 +220,9 @@ module.exports.userInfo = async (req, res) => {
     res.json({ message: err.message });
   }
 };
+
+
+//see user
 
 module.exports.verifyUser = async (req, res) => {
   try {
