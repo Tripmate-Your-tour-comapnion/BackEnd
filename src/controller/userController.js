@@ -271,7 +271,7 @@ module.exports.searchHotel = async (req, res) => {
   try {
     const { key } = req.params;
     const hotels = await ProviderProfile.find({
-      name: { $regex: new RegExp(key, "i") },
+      company_name: { $regex: new RegExp(key, "i") },
     });
     res.json(hotels).status(200);
   } catch (err) {
