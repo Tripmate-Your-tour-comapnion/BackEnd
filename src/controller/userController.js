@@ -278,3 +278,12 @@ module.exports.searchHotel = async (req, res) => {
     res.json({ message: err.message });
   }
 };
+module.exports.getSingleHotel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hotels = await ProviderProfile.findById(id);
+    res.json(hotels).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
