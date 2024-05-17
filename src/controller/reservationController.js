@@ -39,8 +39,9 @@ module.exports.getMyReservations = async (req, res) => {
 module.exports.reserveRoom = async (req, res, next) => {
   const tx_ref = await chapa.generateTransactionReference();
   try {
-    const { role, id,  } = req.user;
-    const { rid, quantity, from, to } = req.body;
+    const { role, id } = req.user;
+    const { rid } = req.params;
+    const { quantity, from, to } = req.body;
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to reserve room" });
     }
