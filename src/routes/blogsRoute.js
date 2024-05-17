@@ -16,8 +16,10 @@ const router = express.Router();
 router.get("/get-all", getAllBlogs);
 router.get("/get-single/:id?", getSingleBlog);
 router.get("/search/:key?", searchBlog);
-router.post("/post-new", upload.single("dest_image"), auth_mw, postBlog);
-router.put("/update/:id?", upload.single("dest_image"), auth_mw, updateBlog);
+router.post("/post-new", upload.single("blog_image"),  postBlog);
+router.put("/update/:id?", upload.single("blog_image"),  updateBlog);
+// router.post("/post-new", upload.single("blog_image"), auth_mw, postBlog);
+// router.put("/update/:id?", upload.single("blog_image"), auth_mw, updateBlog);
 router.delete("/delete/:id?", auth_mw, deleteBlog);
 
 module.exports = router;
