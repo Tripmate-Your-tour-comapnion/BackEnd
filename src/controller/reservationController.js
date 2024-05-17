@@ -42,9 +42,9 @@ module.exports.reserveRoom = async (req, res, next) => {
     const { role, id } = req.user;
     const { rid } = req.params;
     const { quantity, from, to } = req.body;
-    if (role != "tourist") {
-      return res.json({ message: "you are not allowed to reserve room" });
-    }
+    // if (role != "tourist") {
+    //   return res.json({ message: "you are not allowed to reserve room" });
+    // }
     const room = await Rooms.findById(rid);
     if (!room) {
       return res.json({ message: "room does not exist" });
@@ -55,7 +55,7 @@ module.exports.reserveRoom = async (req, res, next) => {
     const reservation = {
       hotel: room.owner,
       room: rid,
-      customer: id,
+      // customer: id,
       from: from,
       to: to,
       tx_ref: tx_ref,
@@ -67,7 +67,7 @@ module.exports.reserveRoom = async (req, res, next) => {
       type: "room",
       owner: room.owner,
       item: rid,
-      id: id,
+      // id: id,
       tx_ref: tx_ref,
       amount: quantity * room.room_price + 0.02 * quantity * room.room_price,
     };

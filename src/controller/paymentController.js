@@ -12,16 +12,17 @@ const Product = require("../models/productModel");
 
 module.exports.chapaPayment = async (req, res, next) => {
   try {
-    const { id, amount, owner, item, tx_ref, type } = req.info;
-    const user = await Users.findById(id);
-    const email = user.email;
-    const full_name = user.full_name;
+    // const { id, amount, owner, item, tx_ref, type } = req.info;
+    const { amount, owner, item, tx_ref, type } = req.info;
+    // const user = await Users.findById(id);
+    // const email = user.email;
+    // const full_name = user.full_name;
     const provider = await Provider.find({ _id: owner });
     const sub_id = provider[0].payment_info.subaccount_id;
     let chapaRequestData = {
-      first_name: full_name,
+      // first_name: full_name,
       last_name: item,
-      email: email,
+      // email: email,
       amount: amount,
       customization: { title: type },
       tx_ref: tx_ref,
