@@ -29,7 +29,7 @@ module.exports.chapaPayment = async (req, res, next) => {
       currency: "ETB",
       callback_url:
         "https://tripmate-tourism-management.onrender.com/reservation/confirm-payment",
-      return_url: "http://localhost:5173/",
+      return_url: "http://localhost:5173/thanks",
       "subaccounts[id]": sub_id,
     };
     const response = await axios.post(
