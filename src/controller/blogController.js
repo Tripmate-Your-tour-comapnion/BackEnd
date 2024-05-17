@@ -34,7 +34,7 @@ module.exports.searchBlog = async (req, res) => {
 
 module.exports.postBlog = async (req, res) => {
   try {
-    const fileUpload = await cloudinary.uploader.upload(req.files.path);
+    const fileUpload = await cloudinary.uploader.upload(req.file.path);
     // const { role } = req.user;
     const { blog_title, blog_description,  } = req.body;
     const blog_image = fileUpload.secure_url;
@@ -62,7 +62,7 @@ module.exports.updateBlog = async (req, res) => {
     // const { role } = req.user;
     const id = req.params.id;
     const { blog_title, blog_description } = req.body;
-    const fileUpload = await cloudinary.uploader.upload(req.files.path);
+    const fileUpload = await cloudinary.uploader.upload(req.file.path);
     const blog_image = fileUpload.secure_url;
     if (!blog_title || !blog_description || !id || !blog_image) {
       return res.json({ message: "all fields are required" });
