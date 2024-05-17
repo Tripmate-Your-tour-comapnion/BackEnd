@@ -14,7 +14,7 @@ const reservationSchema = new mongoose.Schema({
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    // required: true,
     ref: "Users",
   },
   tx_ref: {
