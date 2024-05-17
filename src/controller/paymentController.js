@@ -73,6 +73,7 @@ module.exports.confirmPayment = async (req, res) => {
       .digest("hex");
     if (hash == req.headers["x-chapa-signature"]) {
       const event = req.body;
+      console.log("event:" + event);
       const { tx_ref, status, last_name, customization } = event;
 
       if (status == "success" && tx_ref) {
