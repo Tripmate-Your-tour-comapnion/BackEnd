@@ -38,13 +38,12 @@ module.exports.getSingleRoom = async (req, res) => {
   } catch (err) {
     res.json({ message: err.message });
   }
-  
 };
 module.exports.getAllRoomsOfOneHotel = async (req, res) => {
   try {
     const { id } = req.params;
-    const rooms = await Room.find({owner:id});
-    res.json( rooms ).status(200);
+    const rooms = await Room.find({ owner: id });
+    res.json(rooms).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -95,7 +94,7 @@ module.exports.createRooms = async (req, res) => {
     const room = {
       owner: id,
       room_name: room_name,
-      image: [Image1, Image2, Image3],
+      room_image: [Image1, Image2, Image3],
       room_description: room_description,
       room_price: room_price,
       room_amount: room_amount,
@@ -142,9 +141,9 @@ module.exports.updateRoom = async (req, res) => {
       return res.json({ message: "you are only allowed to update your rooms" });
     }
     room.room_name = room_name || room.room_name;
-    room.image[0] = Image1 || room.image[0];
-    room.image[1] = Image2 || room.image[1];
-    room.image[2] = Image3 || room.image[2];
+    room.room_image[0] = Image1 || room.room_image[0];
+    room.room_image[1] = Image2 || room.room_image[1];
+    room.room_image[2] = Image3 || room.room_image[2];
     room.room_description = room_description || room.room_description;
     room.room_price = room_price || room.room_price;
     room.room_amount = room_amount || room.room_amount;
