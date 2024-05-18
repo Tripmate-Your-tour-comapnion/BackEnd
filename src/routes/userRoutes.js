@@ -26,7 +26,9 @@ router.get("/search-hotel/:key?", searchHotel);
 router.get("/get-single-hotel/:id?", getSingleHotel);
 router.get("/get-all-users/", getAllUsers);
 router.get("/get-user-info", auth_mw, userInfo);
-router.put("/verify-user/:id", auth_mw, verifyUser);
-router.put("/ban-user/:id", auth_mw, banUser);
+router.put("/verify-user/:id",  verifyUser);
+router.put("/ban-user/:id",  banUser);
+// router.put("/verify-user/:id", auth_mw, verifyUser);
+// router.put("/ban-user/:id", auth_mw, banUser);
 
 module.exports = router;
