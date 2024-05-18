@@ -232,10 +232,10 @@ module.exports.userInfo = async (req, res) => {
 
 module.exports.verifyUser = async (req, res) => {
   try {
-    const { role } = req.user;
-    if (role != "admin") {
-      return res.json({ message: "you are not allowed verify user" });
-    }
+    // const { role } = req.user;
+    // if (role != "admin") {
+    //   return res.json({ message: "you are not allowed verify user" });
+    // }
     const id = req.params.id;
     const user = await User.findById(id);
     if (!user) {
@@ -251,10 +251,10 @@ module.exports.verifyUser = async (req, res) => {
 
 module.exports.banUser = async (req, res) => {
   try {
-    const { role } = req.user;
-    if (role != "admin") {
-      return res.json({ message: "you are not allowed ban user" });
-    }
+    // const { role } = req.user;
+    // if (role != "admin") {
+    //   return res.json({ message: "you are not allowed ban user" });
+    // }
     const id = req.params.id;
     const user = await User.findById(id);
     if (!user) {
@@ -262,6 +262,22 @@ module.exports.banUser = async (req, res) => {
     }
     user.verification_status = "banned";
     await user.save();
+    return res.json(user);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+module.exports.getAllUsers = async (req, res) => {
+  try {
+    // const { role } = req.user;
+    // if (role != "admin") {
+    //   return res.json({ message: "you are not allowed ban user" });
+    // }
+    const id = req.params.id;
+    const user = await User.find({});
+    if (!user) {
+      return res.json({ message: "no user found" });
+    }
     return res.json(user);
   } catch (err) {
     res.json({ message: err.message });
