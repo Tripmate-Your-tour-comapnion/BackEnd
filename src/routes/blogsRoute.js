@@ -20,6 +20,7 @@ router.post("/post-new", upload.single("blog_image"),  postBlog);
 router.put("/update/:id?", upload.single("blog_image"),  updateBlog);
 // router.post("/post-new", upload.single("blog_image"), auth_mw, postBlog);
 // router.put("/update/:id?", upload.single("blog_image"), auth_mw, updateBlog);
-router.delete("/delete/:id?", auth_mw, deleteBlog);
+// router.delete("/delete/:id?", auth_mw, deleteBlog);
+router.delete("/delete/:id?",  deleteBlog);
 
 module.exports = router;

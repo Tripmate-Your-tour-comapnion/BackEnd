@@ -86,14 +86,14 @@ module.exports.updateBlog = async (req, res) => {
 
 module.exports.deleteBlog = async (req, res) => {
   try {
-    const { role } = req.user;
+    // const { role } = req.user;
     const id = req.params.id;
     if (!id) {
       return res.json({ message: "id is not provided" });
     }
-    if (role != "admin") {
-      return res.json({ message: "you are not allowed to delete blog" });
-    }
+    // if (role != "admin") {
+    //   return res.json({ message: "you are not allowed to delete blog" });
+    // }
     const blog = await Blog.findByIdAndDelete(id);
     return res.json({ message: "blog deleted sucessfully" }).status(200);
   } catch (err) {
