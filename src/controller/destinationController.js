@@ -50,6 +50,7 @@ module.exports.addDestination = async (req, res) => {
     // }
     const destination = {
       dest_name: dest_name,
+      dest_location:dest_location,
       dest_image: dest_image,
       dest_description: dest_description,
     };
