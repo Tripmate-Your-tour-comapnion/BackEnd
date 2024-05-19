@@ -36,9 +36,11 @@ module.exports.addDestination = async (req, res) => {
   try {
     const fileUpload = await cloudinary.uploader.upload(req.file.path);
     // const { role } = req.user;
-    const { dest_name, dest_description } = req.body;
+    const { dest_name, dest_description, dest_location } = req.body;
+    console.log('req')
+    console.log(req.body)
     const dest_image = fileUpload.secure_url;
-    if (!dest_image || !dest_description || !dest_name) {
+    if (!dest_image || !dest_description || !dest_name || !dest_location) {
       return res.json({ message: "all fields are required" }).status(400);
     }
     // if (role != "admin") {
