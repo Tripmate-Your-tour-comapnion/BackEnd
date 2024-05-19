@@ -7,6 +7,7 @@ const User = require("../models/userModel");
 const Token = require("../models/tokenModel");
 const sendEmail = require("../utils/sendEmail");
 const ProviderProfile = require("../models/providerProfileModel");
+const TouristProfile = require("../models/touristProfileModel");
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 module.exports.signup = async (req, res) => {
@@ -273,10 +274,38 @@ module.exports.getAllUsers = async (req, res) => {
     // if (role != "admin") {
     //   return res.json({ message: "you are not allowed ban user" });
     // }
-    const id = req.params.id;
-    const user = await User.find({});
+    const user = await User.find({ role: { $ne: "admin" } });
     if (!user) {
       return res.json({ message: "no user found" });
+    }
+    return res.json(user);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+module.exports.getSingleUser = async (req, res) => {
+  try {
+    // const { role } = req.user;
+    // if (role != "admin") {
+    //   return res.json({ message: "you are not allowed ban user" });
+    // }
+    const id = req.params.id;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.json({ message: "no user found" });
+    }
+    if (user.role === "tourist") {
+      const tourist = await TouristProfile.findById(id);
+      return res.json({
+        message: "tourist",
+        body: tourist,
+      });
+    } else {
+      const Provider = await ProviderProfile.findById(id);
+      return res.json({
+        message: "Provider",
+        body: Provider,
+      });
     }
     return res.json(user);
   } catch (err) {
