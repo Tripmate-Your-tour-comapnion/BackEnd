@@ -74,7 +74,7 @@ module.exports.updateBlog = async (req, res) => {
     blog.blog_title = blog_title || blog.blog_title;
     blog.blog_image = blog_image || blog.blog_image;
     blog.blog_description = blog_description || blog.blog_description;
-    blog.blog_image = Date.now();
+    blog.blog_date = Date.now();
     await blog.save();
     return res
       .json({ message: "blog updated sucessfully", body: blog })

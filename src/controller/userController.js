@@ -307,7 +307,6 @@ module.exports.getSingleUser = async (req, res) => {
         body: Provider,
       });
     }
-    return res.json(user);
   } catch (err) {
     res.json({ message: err.message });
   }
