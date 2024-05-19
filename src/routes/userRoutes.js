@@ -12,6 +12,7 @@ const {
   searchHotel,
   getSingleHotel,
   getAllUsers,
+  getSingleUser,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -25,6 +26,7 @@ router.put("/reset-password:resetToken", resetPassword);
 router.get("/search-hotel/:key?", searchHotel);
 router.get("/get-single-hotel/:id?", getSingleHotel);
 router.get("/get-all-users/", getAllUsers);
+router.get("/get-single-user/:id?", getSingleUser);
 router.get("/get-user-info", auth_mw, userInfo);
 router.put("/verify-user/:id",  verifyUser);
 router.put("/ban-user/:id",  banUser);
