@@ -12,7 +12,7 @@ const { upload } = require("../middleware/multer");
 const router = express.Router();
 
 router.post(
-  "/provider-credential",
+  "/provider-credential/:id",
   auth_mw,
   upload.fields([
     { name: "profile_image", maxCount: 1 },
@@ -25,7 +25,7 @@ router.post(
 );
 
 router.post(
-  "/tourist-credential",
+  "/tourist-credential/:id",
   auth_mw,
   upload.single("profile_image"),
   touristCredential
