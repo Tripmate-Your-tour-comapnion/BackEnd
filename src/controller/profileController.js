@@ -10,7 +10,7 @@ const chapa = new Chapa({
 
 module.exports.providerCredential = async (req, res) => {
   try {
-    const { id } = req.user;
+    const { id } = req.params;
 
     const { company_name, description, address, acc_name, acc_number, bank } =
       req.body;
@@ -90,12 +90,12 @@ module.exports.providerCredential = async (req, res) => {
 
 module.exports.touristCredential = async (req, res) => {
   try {
-    const { id } = req.user;
+    const { id } = req.params;
     const { passport_id, phone_number } = req.body;
-    const profile_image  = req.files;
+    const profile_image = req.files;
     // Should log file object if uploaded
 
-    const profileUpload = await cloudinary.uploader.upload(req.file.path)
+    const profileUpload = await cloudinary.uploader.upload(req.file.path);
     const profileImage = profileUpload.secure_url;
 
     if (!passport_id || !phone_number) {
