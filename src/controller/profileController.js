@@ -12,14 +12,21 @@ module.exports.providerCredential = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { company_name, description, address, acc_name, acc_number, bank } = req.body;
-    const { profile_image, business_license, image1, image2, image3 } = req.files;
-
-    const profileUpload = await cloudinary.uploader.upload(profile_image[0].path);
+    const { company_name, description, address, acc_name, acc_number, bank } =
+      req.body;
+    console.log(req.body)
+    const { profile_image, bussiness_license, image1, image2, image3 } =
+      req.files;
+    console.log(image1);
+    const profileUpload = await cloudinary.uploader.upload(
+      profile_image[0].path
+    );
     const profileImage = profileUpload.secure_url;
 
-    const businessLicenseUpload = await cloudinary.uploader.upload(business_license[0].path);
-    const businessLicense = businessLicenseUpload.secure_url;
+    const bussinessLicenseUpload = await cloudinary.uploader.upload(
+      bussiness_license[0].path
+    );
+    const bussinessLicense = bussinessLicenseUpload.secure_url;
 
     const image1Upload = await cloudinary.uploader.upload(image1[0].path);
     const Image1 = image1Upload.secure_url;
@@ -28,13 +35,16 @@ module.exports.providerCredential = async (req, res) => {
     const image3Upload = await cloudinary.uploader.upload(image3[0].path);
     const Image3 = image3Upload.secure_url;
 
-    if (!company_name || !description || !address || !acc_name || !acc_number || !bank) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (
+      !company_name ||
+      !description ||
+      !address ||
+      !acc_name ||
+      !acc_number ||
+      !bank
+    ) {
+      return res.status(400).json({ message: "all fields are required" });
     }
-
-    // Debugging: Print the bank value
-    console.log("Received bank value:", bank);
-
     let bank_code;
     if (bank === "Awash Bank") {
       bank_code = "80a510ea-7497-4499-8b49-ac13a3ab7d07";
@@ -48,17 +58,7 @@ module.exports.providerCredential = async (req, res) => {
       bank_code = "853d0598-9c01-41ab-ac99-48eab4da1513";
     } else if (bank === "M-Pesa") {
       bank_code = "953d0598-4e01-41ab-ac93-t9eab4da1u13";
-    } else {
-      console.log("Unknown bank:", bank);
     }
-
-    // Debugging: Check if bank_code is set
-    console.log("Bank code is:", bank_code);
-
-    if (!bank_code) {
-      return res.status(400).json({ message: "Invalid bank selected" });
-    }
-
     const response = await chapa.createSubaccount({
       business_name: company_name,
       account_name: acc_name,
@@ -67,7 +67,6 @@ module.exports.providerCredential = async (req, res) => {
       split_type: "flat",
       split_value: 25,
     });
-
     const user = new Provider({
       _id: id,
       company_name: company_name,
@@ -75,7 +74,7 @@ module.exports.providerCredential = async (req, res) => {
       address: address,
       profile_image: profileImage,
       images: [Image1, Image2, Image3],
-      business_license: businessLicense,
+      bussiness_license: bussinessLicense,
       payment_info: {
         acc_name: acc_name,
         acc_number: acc_number,
@@ -83,15 +82,12 @@ module.exports.providerCredential = async (req, res) => {
         subaccount_id: response.data.subaccount_id,
       },
     });
-
     await user.save();
-    res.status(200).json({ message: "User signup successfully", body: user });
+    res.json({ message: "user signup successfully", body: user }).status(200);
   } catch (err) {
-    console.log("The error: " + err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.log("the error: " + err);
   }
 };
-
 
 module.exports.touristCredential = async (req, res) => {
   try {
