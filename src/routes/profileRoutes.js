@@ -52,7 +52,7 @@ router.put(
   updateTouristCredential
 );
 router.get("/get-tourist-credential/:id?", getTouristCredential);
-router.get("/get-provider-credential/id?", getProviderCredential);
+router.get("/get-provider-credential/:id?", getProviderCredential);
 // router.get('get-tourist-credential',auth_mw,getTouristCredential)
 // router.get('get-provider-credential',auth_mw,getProviderCredential)
 
