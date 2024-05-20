@@ -51,8 +51,8 @@ router.put(
   upload.single("profile_image"),
   updateTouristCredential
 );
-router.get("get-tourist-credential", getTouristCredential);
-router.get("get-provider-credential", getProviderCredential);
+router.get("get-tourist-credential/:id?", getTouristCredential);
+router.get("get-provider-credential/id?", getProviderCredential);
 // router.get('get-tourist-credential',auth_mw,getTouristCredential)
 // router.get('get-provider-credential',auth_mw,getProviderCredential)
 
