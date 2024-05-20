@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post(
   "/provider-credential/:id",
-  auth_mw,
+  // auth_mw,
   upload.fields([
     { name: "profile_image", maxCount: 1 },
     { name: "bussiness_license", maxCount: 1 },
@@ -26,7 +26,7 @@ router.post(
 
 router.post(
   "/tourist-credential/:id",
-  auth_mw,
+  // auth_mw,
   upload.single("profile_image"),
   touristCredential
 );
