@@ -114,6 +114,25 @@ module.exports.touristCredential = async (req, res) => {
   }
 };
 
+module.exports.getTouristCredential = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Tourist.findById(id);
+    res.json({ body: user }).status(200);
+  } catch (err) {
+    console.log("the error: " + err);
+  }
+};
+module.exports.getProviderCredential = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Provider.findById(id);
+    res.json({ body: user }).status(200);
+  } catch (err) {
+    console.log("the error: " + err);
+  }
+};
+
 module.exports.updateTouristCredential = async (req, res) => {
   try {
     const { id } = req.user;

@@ -3,6 +3,8 @@ const {
   touristCredential,
   updateProviderCredential,
   updateTouristCredential,
+  getTouristCredential,
+  getProviderCredential,
 } = require("../controller/profileController");
 const path = require("path");
 const express = require("express");
@@ -33,7 +35,7 @@ router.post(
 
 router.put(
   "/update-provider-credential",
-  auth_mw,
+  // auth_mw,
   upload.fields([
     { name: "profile_image", maxCount: 1 },
     { name: "image1", maxCount: 1 },
@@ -45,9 +47,13 @@ router.put(
 
 router.put(
   "/update-tourist-credential",
-  auth_mw,
+  // auth_mw,
   upload.single("profile_image"),
   updateTouristCredential
 );
+router.get("get-tourist-credential", getTouristCredential);
+router.get("get-provider-credential", getProviderCredential);
+// router.get('get-tourist-credential',auth_mw,getTouristCredential)
+// router.get('get-provider-credential',auth_mw,getProviderCredential)
 
 module.exports = router;
