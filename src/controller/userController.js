@@ -41,7 +41,7 @@ module.exports.signup = async (req, res) => {
         path: "/",
         httpOnly: true,
         sameSite: "none",
-        secure: true,
+        secure: none,
       })
       .json({ message: "user signup successfully", body: user })
       .status(200);
