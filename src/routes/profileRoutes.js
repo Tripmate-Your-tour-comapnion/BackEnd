@@ -3,8 +3,7 @@ const {
   touristCredential,
   updateProviderCredential,
   updateTouristCredential,
-  getTouristCredential,
-  getProviderCredential,
+  getCredential,
 } = require("../controller/profileController");
 const path = require("path");
 const express = require("express");
@@ -14,7 +13,7 @@ const { upload } = require("../middleware/multer");
 const router = express.Router();
 
 router.post(
-  "/provider-credential/:id",
+  "/provider-credential/:id?",
   // auth_mw,
   upload.fields([
     { name: "profile_image", maxCount: 1 },
@@ -27,7 +26,7 @@ router.post(
 );
 
 router.post(
-  "/tourist-credential/:id",
+  "/tourist-credential/:id?",
   // auth_mw,
   upload.single("profile_image"),
   touristCredential
@@ -35,25 +34,38 @@ router.post(
 
 router.put(
   "/update-provider-credential",
-  // auth_mw,
-  upload.fields([
-    { name: "profile_image", maxCount: 1 },
-    { name: "image1", maxCount: 1 },
-    { name: "image2", maxCount: 1 },
-    { name: "image3", maxCount: 1 },
-  ]),
+  auth_mw,
+  upload.single("profile_image"),
   updateProviderCredential
 );
 
+module.exports = router;
+
+// router.put(
+//   "/update-provider-credential",
+//   auth_mw,
+//   // upload.fields([
+//   //   { name: "profile_image", maxCount: 1 },
+//   //   { name: "image1", maxCount: 1 },
+//   //   { name: "image2", maxCount: 1 },
+//   //   { name: "image3", maxCount: 1 },
+//   // ]),
+//   upload.single("profile_image"),
+//   updateProviderCredential
+// );
+
+
 router.put(
   "/update-tourist-credential",
-  // auth_mw,
-  upload.single("profile_image"),
+  auth_mw,
+  upload.single('profile_image'),
   updateTouristCredential
 );
-router.get("/get-tourist-credential/:id?", getTouristCredential);
-router.get("/get-provider-credential/:id?", getProviderCredential);
-// router.get('get-tourist-credential',auth_mw,getTouristCredential)
-// router.get('get-provider-credential',auth_mw,getProviderCredential)
+
+module.exports = router;
+
+// router.get("/get-tourist-credential/:id?", getTouristCredential);
+// router.get("/get-provider-credential/:id?", getProviderCredential);
+router.get("/get-credential", auth_mw, getCredential);
 
 module.exports = router;

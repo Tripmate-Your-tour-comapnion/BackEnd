@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/get-all", auth_mw, getAllSubscriptions);
 router.get("/get-my-subscription", auth_mw, getMySubscriptions);
-router.post("/subscribe-tour", auth_mw, subscribePackage, chapaPayment);
+router.post("/subscribe-tour/:tid?", auth_mw, subscribePackage, chapaPayment);
 router.post("/confirm-payment",confirmPayment);
 
 module.exports = router;

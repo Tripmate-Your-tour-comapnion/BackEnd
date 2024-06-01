@@ -22,15 +22,20 @@ module.exports.getAllSubscriptions = async (req, res) => {
 
 module.exports.getMySubscriptions = async (req, res) => {
   try {
-    const { role, id, status } = req.user;
-    if (role != "tour agent") {
-      return res.json({ message: "you are not allowed to see Subscriptions" });
+    // const { role, id, status } = req.user;
+    const { role, id } = req.user;
+    if (role != "tour guide") {
+      return res
+        .status(403)
+        .json({ message: "you are not allowed to see Subscriptions" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to see Subscriptions" });
-    }
-    const Subscriptions = await Subscriptions.find({ agency: id });
-    res.json({ message: Subscriptions }).status(200);
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to see Subscriptions" });
+    // }
+    const subscriptions = await Subscriptions.find({ agency: id })
+      .populate("customer")
+      .populate("package");
+    res.json(subscriptions).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -40,7 +45,8 @@ module.exports.subscribePackage = async (req, res, next) => {
   const tx_ref = await chapa.generateTransactionReference();
   try {
     const { role, id } = req.user;
-    const { tid, quantity } = req.body;
+    const { tid } = req.params;
+    const { quantity } = req.body;
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to reserve room" });
     }
@@ -57,6 +63,8 @@ module.exports.subscribePackage = async (req, res, next) => {
       customer: id,
       tx_ref: tx_ref,
       quantity: quantity,
+      price:
+        quantity * tour.package_price + 0.02 * quantity * tour.package_price,
       status: "pending for payment",
     };
     await Subscriptions.create(subscription);

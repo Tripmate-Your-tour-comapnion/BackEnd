@@ -4,7 +4,7 @@ const cloudinary = require("../utils/cloudinary");
 module.exports.getAllDestinations = async (req, res) => {
   try {
     const destination = await Destination.find({});
-    res.json({ message: destination }).status(200);
+    res.json(destination).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -35,22 +35,24 @@ module.exports.searchDestinations = async (req, res) => {
 module.exports.addDestination = async (req, res) => {
   try {
     const fileUpload = await cloudinary.uploader.upload(req.file.path);
-    // const { role } = req.user;
-    const { dest_name, dest_description, dest_location } = req.body;
-    console.log('req')
-    console.log(req.body)
+    const { role } = req.user;
+    const { dest_name, dest_description, lat, lng } = req.body;
+    console.log(req.body);
     const dest_image = fileUpload.secure_url;
-    if (!dest_image || !dest_description || !dest_name || !dest_location) {
+    if (!dest_image || !dest_description || !dest_name || !lat || !lng) {
       return res.json({ message: "all fields are required" }).status(400);
     }
-    // if (role != "admin") {
-    //   return res
-    //     .json({ message: "you are not allowed to add destination" })
-    //     .status(400);
-    // }
+    if (role != "admin") {
+      return res
+        .json({ message: "you are not allowed to add destination" })
+        .status(400);
+    }
     const destination = {
       dest_name: dest_name,
-      dest_location:dest_location,
+      dest_location: {
+        lat: lat,
+        lng: lng,
+      },
       dest_image: dest_image,
       dest_description: dest_description,
     };
@@ -65,7 +67,7 @@ module.exports.addDestination = async (req, res) => {
 
 module.exports.updateDestination = async (req, res) => {
   try {
-    // const { role } = req.user;
+    const { role } = req.user;
     const id = req.params.id;
     const { dest_name, dest_description } = req.body;
     const fileUpload = await cloudinary.uploader.upload(req.file.path);
@@ -73,11 +75,11 @@ module.exports.updateDestination = async (req, res) => {
     if (!dest_name || !dest_description || !id || !dest_image) {
       return res.json({ message: "all fields are required" }).status(400);
     }
-    // if (role != "admin") {
-    //   return res
-    //     .json({ message: "you are not allowed to update destination" })
-    //     .status(400);
-    // }
+    if (role != "admin") {
+      return res
+        .json({ message: "you are not allowed to update destination" })
+        .status(400);
+    }
     const destination = await Destination.findById(id);
     destination.dest_name = dest_name || destination.dest_name;
     destination.dest_image = dest_image;
@@ -94,16 +96,16 @@ module.exports.updateDestination = async (req, res) => {
 
 module.exports.deleteDestination = async (req, res) => {
   try {
-    // const { role } = req.user;
+    const { role } = req.user;
     const id = req.params.id;
     if (!id) {
       return res.json({ message: "id is not provided" }).status(400);
     }
-    // if (role != "admin") {
-    //   return res
-    //     .json({ message: "you are not allowed to delete destination" })
-    //     .status(400);
-    // }
+    if (role != "admin") {
+      return res
+        .json({ message: "you are not allowed to delete destination" })
+        .status(400);
+    }
     const destination = await Destination.findByIdAndDelete(id);
     return res.json({ message: "destination deleted sucessfully" }).status(200);
   } catch (err) {

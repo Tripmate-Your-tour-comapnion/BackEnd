@@ -33,11 +33,11 @@ const roomSchema = new mongoose.Schema({
   room_rate: {
     value: {
       type: Number,
-      default: 0,
+      default: 0.0,
     },
     total: {
       type: Number,
-      default: 0,
+      default: 0.0,
     },
     rater_number: {
       type: Number,
@@ -45,5 +45,5 @@ const roomSchema = new mongoose.Schema({
     },
   },
 });
-const Rooms = new mongoose.model("room", roomSchema);
+const Rooms = new mongoose.model("Rooms", roomSchema);
 module.exports = Rooms;

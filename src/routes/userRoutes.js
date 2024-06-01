@@ -13,6 +13,10 @@ const {
   getSingleHotel,
   getAllUsers,
   getSingleUser,
+  logout,
+  getLoginStatus,
+  getCounts,
+  searchAgent,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -20,17 +24,20 @@ const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", Login);
-router.post("/change-password", auth_mw, changePassword);
+router.get("/logout", logout);
+router.get("/count-all", getCounts);
+router.post("/change-password", auth_mw,changePassword);
 router.post("/forgot-password", forgotPassword);
-router.put("/reset-password:resetToken", resetPassword);
+router.put("/reset-password/:resetToken", resetPassword);
 router.get("/search-hotel/:key?", searchHotel);
+router.get("/search-shop/:key?", searchShop);
+router.get("/search-agent/:key?", searchAgent);
+router.get("/get-user-status", getLoginStatus);
 router.get("/get-single-hotel/:id?", getSingleHotel);
-router.get("/get-all-users/", getAllUsers);
-router.get("/get-single-user/:id?", getSingleUser);
+router.get("/get-all-users/", auth_mw, getAllUsers);
+router.get("/get-single-user", auth_mw, getSingleUser);
 router.get("/get-user-info", auth_mw, userInfo);
-router.put("/verify-user/:id",  verifyUser);
-router.put("/ban-user/:id",  banUser);
-// router.put("/verify-user/:id", auth_mw, verifyUser);
-// router.put("/ban-user/:id", auth_mw, banUser);
+router.put("/verify-user/", auth_mw, verifyUser);
+router.put("/ban-user", auth_mw, banUser);
 
 module.exports = router;

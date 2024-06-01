@@ -5,8 +5,16 @@ const DestinationSchema = new mongoose.Schema({
     required: true,
   },
   dest_location: {
-    type: String,
-    required: false,
+    type: {
+      lat: {
+        type: Number,
+        required: true,
+      },
+      lng: {
+        type: Number,
+        required: true,
+      },
+    },
   },
   dest_image: {
     type: String,

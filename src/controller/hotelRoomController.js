@@ -34,7 +34,7 @@ module.exports.getSingleRoom = async (req, res) => {
   try {
     const { id } = req.params;
     const room = await Room.findById(id);
-    res.json({ message: room }).status(200);
+    res.json(room).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -57,7 +57,7 @@ module.exports.getMyRooms = async (req, res) => {
       return res.json({ message: "you are not allowed to see rooms" });
     }
     const rooms = await Room.find({ owner: id });
-    res.json({ message: rooms }).status(200);
+    res.json(rooms).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -65,7 +65,8 @@ module.exports.getMyRooms = async (req, res) => {
 
 module.exports.createRooms = async (req, res) => {
   try {
-    const { role, id, status } = req.user;
+    // const { role, id, status } = req.user;
+    const { role, id } = req.user;
     const { room_name, room_price, room_amount, room_description } = req.body;
     const { image1, image2, image3 } = req.files;
     const image1Upload = await cloudinary.uploader.upload(image1[0].path);
@@ -85,12 +86,12 @@ module.exports.createRooms = async (req, res) => {
     ) {
       return res.json({ message: "all fields are required" }).satus(400);
     }
-    if (role != "hotel manager") {
+    if (role !== "hotel manager") {
       return res.json({ message: "you are not allowed to create rooms" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to create rooms" });
-    }
+    // if (status !== "verified") {
+    //   return res.json({ message: "you must be verified to create rooms" });
+    // }
     const room = {
       owner: id,
       room_name: room_name,
@@ -112,45 +113,60 @@ module.exports.updateRoom = async (req, res) => {
     const { role, id, status } = req.user;
     const rid = req.params.id;
     const { room_name, room_price, room_amount, room_description } = req.body;
-    const { image1, image2, image3 } = req.files;
-    const image1Upload = await cloudinary.uploader.upload(image1[0].path);
-    const Image1 = image1Upload.secure_url;
-    const image2Upload = await cloudinary.uploader.upload(image2[0].path);
-    const Image2 = image2Upload.secure_url;
-    const image3Upload = await cloudinary.uploader.upload(image3[0].path);
-    const Image3 = image3Upload.secure_url;
-    if (
-      !room_name ||
-      !image1 ||
-      !image2 ||
-      !image3 ||
-      !room_price ||
-      !room_amount ||
-      !room_description
-    ) {
-      return res.json({ message: "all fields are required" }).satus(400);
-    }
-    if (role != "hotel manager") {
-      return res.json({ message: "you are not allowed to update rooms" });
-    }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to update rooms" });
-    }
+    const files = req.files;
+
+    // Ensure you have the current room information
     const room = await Room.findById(rid);
-    if (room.owner != id) {
-      return res.json({ message: "you are only allowed to update your rooms" });
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
     }
+
+    // Check if the user has permission to update the room
+    if (room.owner.toString() !== id) {
+      return res
+        .status(403)
+        .json({ message: "You are only allowed to update your rooms" });
+    }
+
+    // Initialize image URLs
+    let image1URL = room.room_image[0];
+    let image2URL = room.room_image[1];
+    let image3URL = room.room_image[2];
+
+    // Process new images if uploaded
+    if (files && files.image1) {
+      const image1Upload = await cloudinary.uploader.upload(
+        files.image1[0].path
+      );
+      image1URL = image1Upload.secure_url;
+    }
+    if (files && files.image2) {
+      const image2Upload = await cloudinary.uploader.upload(
+        files.image2[0].path
+      );
+      image2URL = image2Upload.secure_url;
+    }
+    if (files && files.image3) {
+      const image3Upload = await cloudinary.uploader.upload(
+        files.image3[0].path
+      );
+      image3URL = image3Upload.secure_url;
+    }
+
+    // Update room details
     room.room_name = room_name || room.room_name;
-    room.room_image[0] = Image1 || room.room_image[0];
-    room.room_image[1] = Image2 || room.room_image[1];
-    room.room_image[2] = Image3 || room.room_image[2];
+    room.room_image[0] = image1URL;
+    room.room_image[1] = image2URL;
+    room.room_image[2] = image3URL;
     room.room_description = room_description || room.room_description;
     room.room_price = room_price || room.room_price;
     room.room_amount = room_amount || room.room_amount;
+
     await room.save();
-    res.json({ message: "room updated sucessfully", body: room }).status(200);
+
+    res.status(200).json({ message: "Room updated successfully", body: room });
   } catch (err) {
-    res.json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -188,7 +204,7 @@ module.exports.rateRoom = async (req, res) => {
       return res.json({ message: "room does not exist" });
     }
     room.room_rate.total += rate;
-    room.rate.value = room.room_rate.total / (room.room_rate.rater_number + 1);
+    room.room_rate.value = room.room_rate.total / (room.room_rate.rater_number + 1);
     room.room_rate.rater_number += 1;
     await room.save();
     return res.json({ body: room }).status(200);

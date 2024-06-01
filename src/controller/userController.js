@@ -8,6 +8,9 @@ const Token = require("../models/tokenModel");
 const sendEmail = require("../utils/sendEmail");
 const ProviderProfile = require("../models/providerProfileModel");
 const TouristProfile = require("../models/touristProfileModel");
+const Reservations = require("../models/reservationModel");
+const Subscriptions = require("../models/subscriptionModel");
+
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 module.exports.signup = async (req, res) => {
@@ -90,11 +93,9 @@ module.exports.logout = async (req, res) => {
     sameSite: "none",
     secure: true,
   });
-  res
-    .json({
-      message: "logged out successfully",
-    })
-    .status(200);
+  res.status(200).json({
+    message: "logged out successfully",
+  });
 };
 
 module.exports.changePassword = async (req, res) => {
@@ -102,7 +103,7 @@ module.exports.changePassword = async (req, res) => {
     const id = req.user.id;
     const { old_password, re_password, new_password } = req.body;
     if (!old_password || !re_password || !new_password) {
-      res.json({ message: "all fields are required" });
+      return res.json({ message: "all fields are required" });
     }
     if (!id) {
       return res.json({ message: "not authorized" });
@@ -122,7 +123,7 @@ module.exports.changePassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
-    return res.json({ message: user });
+    return res.json({ message: "password changed successfully", body: user });
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -130,12 +131,13 @@ module.exports.changePassword = async (req, res) => {
 
 module.exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
+  // console.log(email)
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid email address" });
   }
   const user = await User.findOne({ email: email });
   if (!user) {
-    res.send("user doesn't exist");
+    return res.status(400).json({ message: "user doesn't exist" });
   }
 
   let token = await Token.findOne({ userId: user._id });
@@ -158,7 +160,7 @@ module.exports.forgotPassword = async (req, res) => {
     createdAt: Date.now(),
     expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
   }).save();
-  const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   const message = `
   <h2>Hello ${user.full_name}</h2>
@@ -187,7 +189,7 @@ module.exports.forgotPassword = async (req, res) => {
 module.exports.resetPassword = async (req, res) => {
   const { password, re_password } = req.body;
   const { resetToken } = req.params;
-
+  console.log(password);
   const hashedToken = crypto
     .createHash("sha256")
     .update(resetToken)
@@ -209,10 +211,76 @@ module.exports.resetPassword = async (req, res) => {
   // Find user
   const user = await User.findOne({ _id: userToken.userId });
   user.password = password;
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(user.password, salt);
   await user.save();
   res.status(200).json({
     message: "Password Reset Successful, Please Login",
   });
+};
+
+module.exports.getLoginStatus = async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.json(false);
+  }
+  const verified = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
+  if (verified) {
+    return res.json(true);
+  }
+  return res.json(false);
+};
+module.exports.getCounts = async (req, res) => {
+  try {
+    const totalReservationCash = await Reservations.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$price" } } },
+    ]);
+
+    const totalSubscriptionCash = await Subscriptions.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$price" } } },
+    ]);
+
+    // Ensure that total is zero if the aggregation result is empty
+    const reservationTotal =
+      totalReservationCash.length > 0 ? totalReservationCash[0].total : 0;
+    const subscriptionTotal =
+      totalSubscriptionCash.length > 0 ? totalSubscriptionCash[0].total : 0;
+    const totalCash = reservationTotal + subscriptionTotal;
+
+    const hotelCount = await User.countDocuments({ role: "hotel manager" });
+    const agentCount = await User.countDocuments({ role: "tour guide" });
+    const shopCount = await User.countDocuments({ role: "shop owner" });
+    const touristCount = await User.countDocuments({ role: "tourist" });
+    const providersCount = await User.countDocuments({
+      role: { $nin: ["admin", "tourist"] },
+    });
+
+    const bannedCount = await User.countDocuments({
+      verification_status: "banned",
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        hotels: hotelCount,
+        agents: agentCount,
+        shops: shopCount,
+        tourists: touristCount,
+        providers: providersCount,
+        banned: bannedCount,
+        total: totalCash,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching counts:", error); // Add logging
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch counts",
+      error: error.message,
+    });
+  }
 };
 
 module.exports.userInfo = async (req, res) => {
@@ -233,11 +301,11 @@ module.exports.userInfo = async (req, res) => {
 
 module.exports.verifyUser = async (req, res) => {
   try {
-    // const { role } = req.user;
-    // if (role != "admin") {
-    //   return res.json({ message: "you are not allowed verify user" });
-    // }
-    const id = req.params.id;
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed verify user" });
+    }
+    const id = req.body.id;
     const user = await User.findById(id);
     if (!user) {
       return res.json({ message: "user does not exist" });
@@ -252,11 +320,11 @@ module.exports.verifyUser = async (req, res) => {
 
 module.exports.banUser = async (req, res) => {
   try {
-    // const { role } = req.user;
-    // if (role != "admin") {
-    //   return res.json({ message: "you are not allowed ban user" });
-    // }
-    const id = req.params.id;
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed ban user" });
+    }
+    const id = req.body.id;
     const user = await User.findById(id);
     if (!user) {
       return res.json({ message: "user does not exist" });
@@ -270,10 +338,10 @@ module.exports.banUser = async (req, res) => {
 };
 module.exports.getAllUsers = async (req, res) => {
   try {
-    // const { role } = req.user;
-    // if (role != "admin") {
-    //   return res.json({ message: "you are not allowed ban user" });
-    // }
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed ban user" });
+    }
     const user = await User.find({ role: { $ne: "admin" } });
     if (!user) {
       return res.json({ message: "no user found" });
@@ -285,11 +353,11 @@ module.exports.getAllUsers = async (req, res) => {
 };
 module.exports.getSingleUser = async (req, res) => {
   try {
-    // const { role } = req.user;
-    // if (role != "admin") {
-    //   return res.json({ message: "you are not allowed ban user" });
-    // }
-    const id = req.params.id;
+    const { role } = req.user;
+    if (role != "admin") {
+      return res.json({ message: "you are not allowed ban user" });
+    }
+    const id = req.query.id;
     const user = await User.findById(id);
     if (!user) {
       return res.json({ message: "no user found" });
@@ -314,14 +382,44 @@ module.exports.getSingleUser = async (req, res) => {
 module.exports.searchHotel = async (req, res) => {
   try {
     const { key } = req.params;
+    const hotel = await User.find({ role: "hotel manager" }).select("_id");
     const hotels = await ProviderProfile.find({
       company_name: { $regex: new RegExp(key, "i") },
+      _id: { $in: hotel },
     });
     res.json(hotels).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
 };
+module.exports.searchShop = async (req, res) => {
+  try {
+    const { key } = req.params;
+    const shop = await User.find({ role: "shop owner" }).select("_id");
+    const shops = await ProviderProfile.find({
+      company_name: { $regex: new RegExp(key, "i") },
+      _id: { $in: shop },
+    });
+    res.json(shops).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+module.exports.searchAgent = async (req, res) => {
+  try {
+    const { key } = req.params;
+    const agent = await User.find({ role: "tour guide" }).select("_id");
+    const agents = await ProviderProfile.find({
+      company_name: { $regex: new RegExp(key, "i") },
+      _id: { $in: agent },
+    });
+    res.json(agents).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
 module.exports.getSingleHotel = async (req, res) => {
   try {
     const { id } = req.params;

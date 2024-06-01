@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const Users = require("./userModel");
+const User = require("./userModel");
 const Rooms = require("./hotelRoomModel");
 const reservationSchema = new mongoose.Schema({
   hotel: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Users",
+    ref: "User",
   },
   room: {
     type: mongoose.Schema.Types.ObjectId,
@@ -14,8 +14,7 @@ const reservationSchema = new mongoose.Schema({
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
-    // required: true,
-    ref: "Users",
+    ref: "User",
   },
   tx_ref: {
     type: String,
@@ -33,9 +32,14 @@ const reservationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  price: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
   },
 });
-const Reservations = new mongoose.model("reservation", reservationSchema);
+
+const Reservations = mongoose.model("reservation", reservationSchema);
 module.exports = Reservations;

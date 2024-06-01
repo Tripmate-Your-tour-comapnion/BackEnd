@@ -11,10 +11,9 @@ const chapa = new Chapa({
 module.exports.providerCredential = async (req, res) => {
   try {
     const { id } = req.params;
-
     const { company_name, description, address, acc_name, acc_number, bank } =
       req.body;
-    console.log(req.body)
+    console.log(req.body);
     const { profile_image, bussiness_license, image1, image2, image3 } =
       req.files;
     console.log(image1);
@@ -115,24 +114,32 @@ module.exports.touristCredential = async (req, res) => {
   }
 };
 
-module.exports.getTouristCredential = async (req, res) => {
+module.exports.getCredential = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await Tourist.findById(id);
-    res.json({ body: user }).status(200);
+    const { id, role } = req.user;
+    if (role === "tourist") {
+      const user = await Tourist.findById(id).populate("_id");
+      // console.log(user);
+      return res.json({ body: user }).status(200);
+    } else {
+      const user = await Provider.findById(id).populate("_id");
+      // console.log(user);
+
+      return res.json({ body: user }).status(200);
+    }
   } catch (err) {
     console.log("the error: " + err);
   }
 };
-module.exports.getProviderCredential = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await Provider.findById(id);
-    res.json({ body: user }).status(200);
-  } catch (err) {
-    console.log("the error: " + err);
-  }
-};
+// module.exports.getProviderCredential = async (req, res) => {
+//   try {
+//     const { id } = req.user;
+
+//   } catch (err) {
+//     console.log("the error: " + err);
+//   }
+// };
+
 
 module.exports.updateTouristCredential = async (req, res) => {
   try {
@@ -140,21 +147,25 @@ module.exports.updateTouristCredential = async (req, res) => {
     if (!id) {
       return res.json({ message: "not authorized" });
     }
+
     const { phone_number } = req.body;
-    const { profile_image } = req.files;
-    if (!phone_number || !profile_image) {
-      res.json({ message: "all fields are required" });
+    const profile_image = req.file;
+
+    let profileImageUrl = req.body.profile_image; // Keep existing image if no new upload
+
+    if (profile_image) {
+      const profileUpload = await cloudinary.uploader.upload(profile_image.path);
+      profileImageUrl = profileUpload.secure_url;
     }
-    const profileUpload = await cloudinary.uploader.upload(
-      profile_image[0].path
-    );
-    const profileImage = profileUpload.secure_url;
+
     const user = await Tourist.findById(id);
     if (!user) {
       return res.json({ message: "user does not exist" });
     }
+
     user.phone_number = phone_number || user.phone_number;
-    user.profile_image = profileImage || user.profile_image;
+    user.profile_image = profileImageUrl;
+
     await user.save();
     return res.json({ message: "user updated successfully", body: user });
   } catch (err) {
@@ -168,42 +179,31 @@ module.exports.updateProviderCredential = async (req, res) => {
     if (!id) {
       return res.json({ message: "not authorized" });
     }
-    const { description, address, company_name } = req.body;
-    const { profile_image, image1, image2, image3 } = req.files;
-    // if (
-    //   !phone_number ||
-    //   !profile_image ||
-    //   !description ||
-    //   !address ||
-    //   !company_name
-    // ) {
-    //   res.json({ message: "all fields are required" });
-    // }
-    const profileUpload = await cloudinary.uploader.upload(
-      profile_image[0].path
-    );
-    const profileImage = profileUpload.secure_url;
-    const image1Upload = await cloudinary.uploader.upload(image1[0].path);
-    const Image1 = image1Upload.secure_url;
-    const image2Upload = await cloudinary.uploader.upload(image2[0].path);
-    const Image2 = image2Upload.secure_url;
 
-    const image3Upload = await cloudinary.uploader.upload(image3[0].path);
-    const Image3 = image3Upload.secure_url;
+    const { description, address, company_name } = req.body;
+    const profile_image = req.file;
+
+    let profileImageUrl = req.body.profile_image; // Keep existing image if no new upload
+
+    if (profile_image) {
+      const profileUpload = await cloudinary.uploader.upload(profile_image.path);
+      profileImageUrl = profileUpload.secure_url;
+    }
+
     const user = await Provider.findById(id);
     if (!user) {
       return res.json({ message: "user does not exist" });
     }
+
     user.description = description || user.description;
     user.address = address || user.address;
     user.company_name = company_name || user.company_name;
-    user.profile_image = profileImage || user.profile_image;
-    user.images[0] = Image1 || user.images[0];
-    user.images[1] = Image2 || user.images[1];
-    user.images[2] = Image3 || user.images[2];
+    user.profile_image = profileImageUrl;
+
     await user.save();
     return res.json({ message: "user updated successfully", body: user });
   } catch (err) {
     res.json({ message: err.message });
   }
 };
+

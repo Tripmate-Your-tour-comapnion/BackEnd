@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const Users = require("./blogModel");
+const User = require("./userModel");
 const tourSchema = new mongoose.Schema({
   agent: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Users",
+    ref: "User",
   },
   package_name: {
     type: String,
@@ -49,5 +49,5 @@ const tourSchema = new mongoose.Schema({
     },
   },
 });
-const Tours = new mongoose.model("tour", tourSchema);
+const Tours = new mongoose.model("Tour", tourSchema);
 module.exports = Tours;
