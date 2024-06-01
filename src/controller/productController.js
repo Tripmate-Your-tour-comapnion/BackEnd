@@ -43,7 +43,7 @@ module.exports.searchProduct = async (req, res) => {
 module.exports.getAllProductsOfOneShop = async (req, res) => {
   try {
     const { id } = req.params;
-    const products = await Product.find({ owner: id });
+    const products = await Product.find({ shop_owner: id });
     res.json(products).status(200);
   } catch (err) {
     res.json({ message: err.message });
