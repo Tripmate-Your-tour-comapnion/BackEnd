@@ -40,6 +40,16 @@ module.exports.searchProduct = async (req, res) => {
   }
 };
 
+module.exports.getAllProductsOfOneShop = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const products = await Product.find({ owner: id });
+    res.json(products).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
 module.exports.getMyProducts = async (req, res) => {
   try {
     const { role, id } = req.user;
@@ -61,7 +71,8 @@ module.exports.createProducts = async (req, res) => {
     //   const errorMessage = error.details[0].message;
     //   return res.status(400).send(errorMessage);
     // }
-    const { role, id, status } = req.user;
+    // const { role, id, status } = req.user;
+    const { role, id } = req.user;
     const {
       product_name,
       product_description,
@@ -89,9 +100,9 @@ module.exports.createProducts = async (req, res) => {
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to create shops" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to create shops" });
-    }
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to create shops" });
+    // }
     const product = {
       shop_owner: id,
       product_name: product_name,
@@ -99,10 +110,10 @@ module.exports.createProducts = async (req, res) => {
       product_description: product_description,
       product_price: product_price,
       product_quantity: product_quantity,
-      product_available: product_quantity
+      product_available: product_quantity,
     };
     await Product.create(product);
-    res.json(product); // Send back updated products array
+    res.json({ body: product, message: "product added successfully" });
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -168,7 +179,7 @@ module.exports.updateProduct = async (req, res) => {
 
 module.exports.deleteProduct = async (req, res) => {
   try {
-    const { role, id,status } = req.user;
+    const { role, id, status } = req.user;
     const pid = req.params.id;
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to delete product" });

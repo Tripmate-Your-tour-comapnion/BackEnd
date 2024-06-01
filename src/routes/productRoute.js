@@ -10,6 +10,7 @@ const {
   createProducts,
   updateProduct,
   deleteProduct,
+  getAllProductsOfOneShop,
 } = require("../controller/productController");
 
 const router = express.Router();
@@ -18,6 +19,8 @@ router.get("/get-all", auth_mw, getAllProducts);
 router.get("/get-single/:id?", getSingleProduct);
 router.get("/search/:key?", auth_mw, searchProduct);
 router.get("/get-my-products", auth_mw, getMyProducts);
+router.get("/get-all-products/:id", getAllProductsOfOneShop);
+
 
 router.post(
   "/create-new",
