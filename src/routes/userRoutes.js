@@ -17,6 +17,7 @@ const {
   getLoginStatus,
   getCounts,
   searchAgent,
+  searchShop,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
