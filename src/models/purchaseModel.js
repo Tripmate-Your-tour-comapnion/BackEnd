@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
-const Users = require("./userModel");
+const User = require("./userModel");
 const Rooms = require("./hotelRoomModel");
 const purchaseSchema = new mongoose.Schema({
   shop: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Users",
+    ref: "User",
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Users",
+    ref: "User",
   },
   product: {
     type: mongoose.Schema.Types.ObjectId,
