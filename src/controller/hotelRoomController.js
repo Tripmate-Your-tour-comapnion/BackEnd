@@ -47,8 +47,7 @@ module.exports.getAllRoomsOfOneHotel = async (req, res) => {
   } catch (err) {
     res.json({ message: err.message });
   }
-};
-
+}
 module.exports.getMyRooms = async (req, res) => {
   try {
     const { role, id } = req.user;
