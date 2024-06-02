@@ -121,7 +121,8 @@ module.exports.createProducts = async (req, res) => {
 
 module.exports.updateProduct = async (req, res) => {
   try {
-    const { role, id, status } = req.user;
+    // const { role, id, status } = req.user;
+    const { role, id } = req.user;
     const pid = req.params.id;
     const {
       product_name,
@@ -129,18 +130,18 @@ module.exports.updateProduct = async (req, res) => {
       product_price,
       product_quantity,
     } = req.body;
-    const { image1, image2, image3 } = req.files;
-    const image1Upload = await cloudinary.uploader.upload(image1[0].path);
-    const Image1 = image1Upload.secure_url;
-    const image2Upload = await cloudinary.uploader.upload(image2[0].path);
-    const Image2 = image2Upload.secure_url;
-    const image3Upload = await cloudinary.uploader.upload(image3[0].path);
-    const Image3 = image3Upload.secure_url;
+    let { image1, image2, image3 } = req.files;
+    if (image1){const image1Upload = await cloudinary.uploader.upload(image1[0].path);
+     image1 = image1Upload.secure_url;}
+    if (image2){ const image2Upload = await cloudinary.uploader.upload(image2[0].path);
+     image2 = image2Upload.secure_url;}
+    if (image3){const image3Upload = await cloudinary.uploader.upload(image3[0].path);
+      image3 = image3Upload.secure_url;}
     if (
       !product_name ||
-      !image1 ||
-      !image2 ||
-      !image3 ||
+      // !image1 ||
+      // !image2 ||
+      // !image3 ||
       !product_description ||
       !product_price ||
       !product_quantity
@@ -150,9 +151,9 @@ module.exports.updateProduct = async (req, res) => {
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to update products" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to update products" });
-    }
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to update products" });
+    // }
     const product = await Product.findById(pid);
     if (!product) return res.status(404).send("product not found");
     if (product.shop_owner != id) {
@@ -161,16 +162,16 @@ module.exports.updateProduct = async (req, res) => {
       });
     }
     product.product_name = product_name || product.product_name;
-    product.product_images[0] = Image1 || product.product_images[0];
-    product.product_images[1] = Image2 || product.product_images[1];
-    product.product_images[2] = Image3 || product.product_images[2];
+    product.product_images[0] = image1 || product.product_images[0];
+    product.product_images[1] = image2 || product.product_images[1];
+    product.product_images[2] = image3 || product.product_images[2];
     product.product_description =
       product_description || product.product_description;
     product.product_price = product_price || product.product_price;
-    product.product_amount = product_amount || product.product_amount;
+    product.product_quantity = product_quantity || product.product_quantity;
     await product.save();
     res
-      .json({ message: "product updated sucessfully", body: room })
+      .json({ message: "product updated sucessfully", body: product })
       .status(200);
   } catch (err) {
     res.json({ message: err.message });

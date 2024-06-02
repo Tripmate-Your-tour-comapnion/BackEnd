@@ -12,6 +12,6 @@ const router = express.Router();
 
 router.get("/get-all", auth_mw, getAllPurchases);
 router.get("/get-my-purchases", auth_mw, getMyPurchases);
-router.post("/purchase-product", auth_mw, purchaseProduct, chapaPayment);
+router.post("/purchase-product/:pid?", auth_mw, purchaseProduct, chapaPayment);
 router.post("/confirm-payment",confirmPayment);
 module.exports = router;

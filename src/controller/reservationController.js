@@ -24,7 +24,7 @@ module.exports.getAllReservations = async (req, res) => {
 module.exports.getMyReservations = async (req, res) => {
   try {
     const { role, id } = req.user;
-    console.log("User Info:", req.user);
+    // console.log("User Info:", req.user);
 
     if (role !== "hotel manager") {
       return res
