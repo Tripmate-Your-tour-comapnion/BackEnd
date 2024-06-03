@@ -8,7 +8,7 @@ module.exports.getAllPackages = async (req, res) => {
       return res.json({ message: "you are not allowed to see packages" });
     }
     const tours = await Tours.find({});
-    res.json({ message: tours }).status(200);
+    res.json({ tours }).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
