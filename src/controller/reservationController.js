@@ -54,6 +54,7 @@ module.exports.reserveRoom = async (req, res, next) => {
     const { role, id } = req.user;
     const { rid } = req.params;
     const { quantity, from, to, days } = req.body;
+    console.log(req.body);
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to reserve room" });
     }
