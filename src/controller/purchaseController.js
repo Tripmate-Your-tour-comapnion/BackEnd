@@ -47,7 +47,7 @@ module.exports.purchaseProduct = async (req, res, next) => {
   const tx_ref = await chapa.generateTransactionReference();
   try {
     const { role, id } = req.user;
-    const { pid } = req.params;
+    const { pid } = req.body;
     const { quantity } = req.body;
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to purchase product" });
