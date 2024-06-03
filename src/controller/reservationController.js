@@ -53,7 +53,7 @@ module.exports.reserveRoom = async (req, res, next) => {
   try {
     const { role, id } = req.user;
     const { rid } = req.params;
-    const { quantity, from, to } = req.body;
+    const { quantity, from, to, days } = req.body;
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to reserve room" });
     }
@@ -72,7 +72,7 @@ module.exports.reserveRoom = async (req, res, next) => {
       to: to,
       tx_ref: tx_ref,
       quantity: quantity,
-      price: quantity * room.room_price + 0.02 * quantity * room.room_price,
+      price: quantity * room.room_price * days,
       status: "pending for payment",
     };
     await Reservations.create(reservation);
@@ -82,7 +82,7 @@ module.exports.reserveRoom = async (req, res, next) => {
       item: rid,
       id: id,
       tx_ref: tx_ref,
-      amount: quantity * room.room_price + 0.02 * quantity * room.room_price,
+      amount: quantity * room.room_price * days,
     };
     req.info = info;
     next();
