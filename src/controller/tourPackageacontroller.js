@@ -195,24 +195,24 @@ module.exports.deletePackage = async (req, res) => {
   }
 };
 
-module.exports.ratePackage = async (req, res) => {
-  try {
-    const { role } = req.user;
-    const { rate } = req.body;
-    const { id } = req.params;
-    if (role != "tourist") {
-      return res.json({ message: "you are not allowed to rate Tours" });
-    }
-    const tour = await Tours.findById(id);
-    if (!tour) {
-      return res.json({ message: "tour does not exist" });
-    }
-    tour.rate.total += rate;
-    tour.rate.value = tour.rate.total / (tour.rate.rater_number + 1);
-    tour.rate.rater_number += 1;
-    await tour.save();
-    return res.json({ body: tour }).status(200);
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-};
+// module.exports.ratePackage = async (req, res) => {
+//   try {
+//     const { role } = req.user;
+//     const { rate } = req.body;
+//     const { id } = req.params;
+//     if (role != "tourist") {
+//       return res.json({ message: "you are not allowed to rate Tours" });
+//     }
+//     const tour = await Tours.findById(id);
+//     if (!tour) {
+//       return res.json({ message: "tour does not exist" });
+//     }
+//     tour.rate.total += rate;
+//     tour.rate.value = tour.rate.total / (tour.rate.rater_number + 1);
+//     tour.rate.rater_number += 1;
+//     await tour.save();
+//     return res.json({ body: tour }).status(200);
+//   } catch (err) {
+//     res.json({ message: err.message });
+//   }
+// };

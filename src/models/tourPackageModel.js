@@ -18,10 +18,6 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  package_includes: {
-    type: Array,
-    required: true,
-  },
   package_price: {
     type: Number,
     required: true,
@@ -33,20 +29,6 @@ const tourSchema = new mongoose.Schema({
   space_left: {
     type: Number,
     required: true,
-  },
-  rate: {
-    value: {
-      type: Number,
-      default: 0,
-    },
-    total: {
-      type: Number,
-      default: 0,
-    },
-    rater_number: {
-      type: Number,
-      default: 0,
-    },
   },
 });
 const Tours = new mongoose.model("Tour", tourSchema);

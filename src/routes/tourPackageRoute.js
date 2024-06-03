@@ -42,7 +42,7 @@ router.put(
   auth_mw,
   updatePackage
 );
-router.post("/rate-tours/:id?", auth_mw, ratePackage);
+// router.post("/rate-tours/:id?", auth_mw, ratePackage);
 router.delete("/delete/:id?", auth_mw, deletePackage);
 
 module.exports = router;
