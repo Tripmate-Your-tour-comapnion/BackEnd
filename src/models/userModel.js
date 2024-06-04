@@ -11,6 +11,10 @@ const userSchema = mongoose.Schema({
     unique: true,
     match: [emailRegex, "Please enter a valid email address"],
   },
+  confirmed: {
+    type: Boolean,
+    default: false,
+  },
   password: {
     type: String,
     required: true,
