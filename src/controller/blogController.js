@@ -62,17 +62,26 @@ module.exports.updateBlog = async (req, res) => {
     const { role } = req.user;
     const id = req.params.id;
     const { blog_title, blog_description } = req.body;
-    const fileUpload = await cloudinary.uploader.upload(req.file.path);
-    const blog_image = fileUpload.secure_url;
-    if (!blog_title || !blog_description || !id || !blog_image) {
-      return res.json({ message: "all fields are required" });
-    }
+    const file = req.file;
     if (role != "admin") {
       return res.json({ message: "you are not allowed to update blog" });
     }
     const blog = await Blog.findById(id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+    let blog_image = blog.blog_image;
+
+    if (file) {
+      const fileUpload = await cloudinary.uploader.upload(req.file.path);
+      blog_image = fileUpload.secure_url;
+    }
+    if (!blog_title || !blog_description || !id || !blog_image) {
+      return res.json({ message: "all fields are required" });
+    }
+
     blog.blog_title = blog_title || blog.blog_title;
-    blog.blog_image = blog_image || blog.blog_image;
+    blog.blog_image = blog_image ;
     blog.blog_description = blog_description || blog.blog_description;
     blog.blog_date = Date.now();
     await blog.save();

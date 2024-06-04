@@ -70,17 +70,25 @@ module.exports.updateDestination = async (req, res) => {
     const { role } = req.user;
     const id = req.params.id;
     const { dest_name, dest_description } = req.body;
-    const fileUpload = await cloudinary.uploader.upload(req.file.path);
-    const dest_image = fileUpload.secure_url;
-    if (!dest_name || !dest_description || !id || !dest_image) {
-      return res.json({ message: "all fields are required" }).status(400);
-    }
+    const file = req.file;
     if (role != "admin") {
       return res
         .json({ message: "you are not allowed to update destination" })
         .status(400);
     }
     const destination = await Destination.findById(id);
+    if (!destination) {
+      return res.status(404).json({ message: "Destination not found" });
+    }
+    let dest_image = destination.dest_image;
+    if (file) {
+      const fileUpload = await cloudinary.uploader.upload(file.path);
+      dest_image = fileUpload.secure_url;
+    }
+    if (!dest_name || !dest_description || !id || !dest_image) {
+      return res.json({ message: "all fields are required" }).status(400);
+    }
+
     destination.dest_name = dest_name || destination.dest_name;
     destination.dest_image = dest_image;
     destination.dest_description =

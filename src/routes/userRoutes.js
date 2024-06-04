@@ -10,7 +10,7 @@ const {
   forgotPassword,
   resetPassword,
   searchHotel,
-  getSingleHotel,
+  getSingleProvider,
   getAllUsers,
   getSingleUser,
   logout,
@@ -34,7 +34,7 @@ router.get("/search-hotel/:key?", searchHotel);
 router.get("/search-shop/:key?", searchShop);
 router.get("/search-agent/:key?", searchAgent);
 router.get("/get-user-status", getLoginStatus);
-router.get("/get-single-hotel/:id?", getSingleHotel);
+router.get("/get-single-provider/:id?", getSingleProvider);
 router.get("/get-all-users/", auth_mw, getAllUsers);
 router.get("/get-single-user", auth_mw, getSingleUser);
 router.get("/get-user-info", auth_mw, userInfo);

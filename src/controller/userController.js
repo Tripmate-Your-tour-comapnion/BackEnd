@@ -420,7 +420,7 @@ module.exports.searchAgent = async (req, res) => {
   }
 };
 
-module.exports.getSingleHotel = async (req, res) => {
+module.exports.getSingleProvider = async (req, res) => {
   try {
     const { id } = req.params;
     const hotels = await ProviderProfile.findById(id);
