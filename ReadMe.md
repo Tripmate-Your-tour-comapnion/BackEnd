@@ -10,7 +10,7 @@
 
 ### Pull Requests and Commit Messages:
 - When merging a feature branch into the `test` branch, team members must create a pull request.
-- The pull request title should succinctly describe the feature or task being merged.
+- The pull request title should succinctly describe the feature or task being merged..
 - Commit messages accompanying the pull request must be meaningful and descriptive, providing clear information about the changes made.
 
 
