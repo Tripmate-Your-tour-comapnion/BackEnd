@@ -423,8 +423,8 @@ module.exports.searchAgent = async (req, res) => {
 module.exports.getSingleProvider = async (req, res) => {
   try {
     const { id } = req.params;
-    const hotels = await ProviderProfile.findById(id);
-    res.json(hotels).status(200);
+    const provider = await ProviderProfile.findById(id).populate("_id");
+    res.json(provider).status(200);
   } catch (err) {
     res.json({ message: err.message });
   }
