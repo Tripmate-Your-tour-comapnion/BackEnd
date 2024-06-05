@@ -100,12 +100,10 @@ module.exports.Login = async (req, res) => {
       return res.status(400).json({ message: "invalid email or password" });
     }
     if (user.confirmed == false) {
-      return res
-        .status(400)
-        .json({
-          isConfirmed: user.confirmed,
-          message: "please confirm your email to login",
-        });
+      return res.status(400).json({
+        isConfirmed: user.confirmed,
+        message: "please confirm your email to login",
+      });
     }
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
@@ -224,7 +222,9 @@ module.exports.forgotPassword = async (req, res) => {
 
   try {
     await sendEmail(subject, message, send_to, sent_from);
-    res.status(200).json({ success: true, message: "Reset Email Sent" });
+    res
+      .status(200)
+      .json({ success: true, body: resetUrl, message: "Reset Email Sent" });
   } catch (error) {
     res.status(500).send(error.message);
   }
