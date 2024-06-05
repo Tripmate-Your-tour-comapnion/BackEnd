@@ -57,7 +57,7 @@ module.exports.signup = async (req, res) => {
       createdAt: Date.now(),
       expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
     }).save();
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${token}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${verifyToken}`;
     const message = `
     <h2>Hello ${user.full_name}</h2>
     <p>Please use the url below to confirm your Email</p>  
