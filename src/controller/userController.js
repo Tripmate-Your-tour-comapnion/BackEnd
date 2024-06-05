@@ -473,25 +473,25 @@ module.exports.getSingleProvider = async (req, res) => {
 
 module.exports.verifyEmail = async (req, res) => {
   const { verifyToken } = req.params;
-  console.log(verifyToken);
+  console.log("verify token:" + verifyToken);
   const hashedToken = crypto
     .createHash("sha256")
     .update(verifyToken)
     .digest("hex");
-  // console.log(hashedToken);
+  console.log("hashed token:" + hashedToken);
 
   // fIND tOKEN in DB
   const userToken = await Token.findOne({
     token: hashedToken,
     expiresAt: { $gt: Date.now() },
   });
-
-  if (!userToken) {
+  console.log("user token:" + userToken);
+  if (!userToken || userToken == null) {
     res.status(404).json({
       message: "Invalid or Expired Token",
     });
   }
-  console.log(userToken);
+  // console.log(userToken);
   // Find user
   const user = await User.findOne({ _id: userToken.userId });
   user.confirmed = true;
