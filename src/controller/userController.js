@@ -99,7 +99,7 @@ module.exports.Login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "invalid email or password" });
     }
-    if (user.confirmed) {
+    if (user.confirmed == false) {
       return res
         .status(400)
         .json({ message: "please confirm your email to login" });
