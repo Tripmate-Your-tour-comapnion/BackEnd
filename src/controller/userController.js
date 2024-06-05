@@ -39,29 +39,41 @@ module.exports.signup = async (req, res) => {
       process.env.PRIVATE_SECERET_TOKEN
     );
     await user.save();
-    try {
-      const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${token}`;
-      const message = `
+    let Vtoken = await Token.findOne({ userId: user._id });
+    if (Vtoken) {
+      await Vtoken.deleteOne();
+    }
+    let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
+    console.log(verifyToken);
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verifyToken)
+      .digest("hex");
+
+    // Save Token to DB
+    await new Token({
+      userId: user._id,
+      token: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
+    }).save();
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${token}`;
+    const message = `
     <h2>Hello ${user.full_name}</h2>
     <p>Please use the url below to confirm your Email</p>  
-    <p>This verify link is valid for only 15 minutes.</p>
   
     <a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
   
     <p>Regards...</p>
     <p>Tripmate Team</p>
   `;
-      const subject = "Account Verification Request";
-      const send_to = user.email;
-      console.log(send_to);
-      const sent_from = process.env.EMAIL_USER;
-      console.log(sent_from);
+    const subject = "Account Verification Request";
+    const send_to = user.email;
+    console.log(send_to);
+    const sent_from = process.env.EMAIL_USER;
+    console.log(sent_from);
 
-      await sendEmail(subject, message, send_to, sent_from);
-      res.status(200).json({ success: true, message: "Verify Email Sent" });
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
+    await sendEmail(subject, message, send_to, sent_from);
     res
       .cookie("token", token, {
         path: "/",
@@ -69,10 +81,11 @@ module.exports.signup = async (req, res) => {
         sameSite: "none",
         secure: true,
       })
-      .json({ message: "user signup successfully", body: user })
+      .json({ body: user, success: true, message: "Verify Email Sent" })
       .status(200);
   } catch (err) {
     console.log(err.message);
+    res.json({ message: err.message });
   }
 };
 
@@ -458,59 +471,31 @@ module.exports.getSingleProvider = async (req, res) => {
   }
 };
 
-module.exports.verifyRequest = async (req, res) => {
-  const { email } = req.body;
-  // console.log(email)
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email address" });
-  }
-  const user = await User.findOne({ email: email });
-  if (!user) {
-    return res.status(400).json({ message: "user doesn't exist" });
-  }
-
-  let Vtoken = await Token.findOne({ userId: user._id });
-  if (Vtoken) {
-    await Vtoken.deleteOne();
-  }
-
-  let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
-  console.log(verifyToken);
-
+module.exports.verifyEmail = async (req, res) => {
+  const { verifyToken } = req.params;
   const hashedToken = crypto
     .createHash("sha256")
     .update(verifyToken)
     .digest("hex");
 
-  // Save Token to DB
-  await new Token({
-    userId: user._id,
+  // fIND tOKEN in DB
+  const userToken = await Token.findOne({
     token: hashedToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
-  }).save();
-  const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${verifyToken}`;
+    expiresAt: { $gt: Date.now() },
+  });
 
-  const message = `
-  <h2>Hello ${user.full_name}</h2>
-  <p>Please use the url below to verify your Account</p>  
-  <p>This verify link is valid for only 15 minutes.</p>
-
-  <a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
-
-  <p>Regards...</p>
-  <p>Tripmate Team</p>
-`;
-  const subject = "Account Verification Request";
-  const send_to = user.email;
-  console.log(send_to);
-  const sent_from = process.env.EMAIL_USER;
-  console.log(sent_from);
-
-  try {
-    await sendEmail(subject, message, send_to, sent_from);
-    res.status(200).json({ success: true, message: "Verify Email Sent" });
-  } catch (error) {
-    res.status(500).send(error.message);
+  if (!userToken) {
+    res.status(404).json({
+      message: "Invalid or Expired Token",
+    });
   }
+
+  // Find user
+  const user = await User.findOne({ _id: userToken.userId });
+  user.confirmed = true;
+  await user.save();
+  res.status(200).json({
+    body: user,
+    message: "Email confirmation successful, Please Login",
+  });
 };

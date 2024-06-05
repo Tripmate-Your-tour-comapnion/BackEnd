@@ -140,7 +140,6 @@ module.exports.getCredential = async (req, res) => {
 //   }
 // };
 
-
 module.exports.updateTouristCredential = async (req, res) => {
   try {
     const { id } = req.user;
@@ -154,7 +153,9 @@ module.exports.updateTouristCredential = async (req, res) => {
     let profileImageUrl = req.body.profile_image; // Keep existing image if no new upload
 
     if (profile_image) {
-      const profileUpload = await cloudinary.uploader.upload(profile_image.path);
+      const profileUpload = await cloudinary.uploader.upload(
+        profile_image.path
+      );
       profileImageUrl = profileUpload.secure_url;
     }
 
@@ -181,12 +182,14 @@ module.exports.updateProviderCredential = async (req, res) => {
     }
 
     const { description, address, company_name } = req.body;
+    console.log(req.body);
+    console.log(req);
     const profile_image = req.file;
-
+    console.log(profile_image);
     let profileImageUrl = req.body.profile_image; // Keep existing image if no new upload
-
+    // let profileImageUrl;
     if (profile_image) {
-      const profileUpload = await cloudinary.uploader.upload(profile_image.path);
+      const profileUpload = await cloudinary.uploader.upload(req.file.path);
       profileImageUrl = profileUpload.secure_url;
     }
 
@@ -206,4 +209,3 @@ module.exports.updateProviderCredential = async (req, res) => {
     res.json({ message: err.message });
   }
 };
-

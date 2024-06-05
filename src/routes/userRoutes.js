@@ -18,6 +18,7 @@ const {
   getCounts,
   searchAgent,
   searchShop,
+  verifyEmail,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -27,7 +28,7 @@ router.post("/signup", signup);
 router.post("/login", Login);
 router.get("/logout", logout);
 router.get("/count-all", getCounts);
-router.post("/change-password", auth_mw,changePassword);
+router.post("/change-password", auth_mw, changePassword);
 router.post("/forgot-password", forgotPassword);
 router.put("/reset-password/:resetToken", resetPassword);
 router.get("/search-hotel/:key?", searchHotel);
@@ -40,5 +41,6 @@ router.get("/get-single-user", auth_mw, getSingleUser);
 router.get("/get-user-info", auth_mw, userInfo);
 router.put("/verify-user/", auth_mw, verifyUser);
 router.put("/ban-user", auth_mw, banUser);
+router.put("/verify-email/:verifyToken", verifyEmail);
 
 module.exports = router;
