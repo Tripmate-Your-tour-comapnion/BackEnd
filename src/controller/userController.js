@@ -102,7 +102,10 @@ module.exports.Login = async (req, res) => {
     if (user.confirmed == false) {
       return res
         .status(400)
-        .json({ message: "please confirm your email to login" });
+        .json({
+          body: user.confirmed,
+          message: "please confirm your email to login",
+        });
     }
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
