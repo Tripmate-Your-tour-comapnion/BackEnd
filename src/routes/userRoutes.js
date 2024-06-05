@@ -19,6 +19,7 @@ const {
   searchAgent,
   searchShop,
   verifyEmail,
+  getConfirmStatus,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -35,6 +36,7 @@ router.get("/search-hotel/:key?", searchHotel);
 router.get("/search-shop/:key?", searchShop);
 router.get("/search-agent/:key?", searchAgent);
 router.get("/get-user-status", getLoginStatus);
+router.get("/get-confirm-status", getConfirmStatus);
 router.get("/get-single-provider/:id?", getSingleProvider);
 router.get("/get-all-users/", auth_mw, getAllUsers);
 router.get("/get-single-user", auth_mw, getSingleUser);
