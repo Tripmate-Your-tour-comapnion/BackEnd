@@ -473,10 +473,12 @@ module.exports.getSingleProvider = async (req, res) => {
 
 module.exports.verifyEmail = async (req, res) => {
   const { verifyToken } = req.params;
+  console.log(verifyToken);
   const hashedToken = crypto
     .createHash("sha256")
     .update(verifyToken)
     .digest("hex");
+  // console.log(hashedToken);
 
   // fIND tOKEN in DB
   const userToken = await Token.findOne({
@@ -489,7 +491,7 @@ module.exports.verifyEmail = async (req, res) => {
       message: "Invalid or Expired Token",
     });
   }
-
+  console.log(userToken);
   // Find user
   const user = await User.findOne({ _id: userToken.userId });
   user.confirmed = true;
