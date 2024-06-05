@@ -103,7 +103,7 @@ module.exports.Login = async (req, res) => {
       return res
         .status(400)
         .json({
-          body: user.confirmed,
+          isConfirmed: user.confirmed,
           message: "please confirm your email to login",
         });
     }
