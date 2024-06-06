@@ -69,7 +69,8 @@ module.exports.updateDestination = async (req, res) => {
   try {
     const { role } = req.user;
     const id = req.params.id;
-    const { dest_name, dest_description } = req.body;
+    const { dest_name, dest_description, lat, lng } = req.body;
+    console.log(req.body);
     const file = req.file;
     if (role != "admin") {
       return res
@@ -91,6 +92,8 @@ module.exports.updateDestination = async (req, res) => {
 
     destination.dest_name = dest_name || destination.dest_name;
     destination.dest_image = dest_image;
+    destination.dest_location.lat = lat || destination.dest_location.lat;
+    destination.dest_location.lat = lng || destination.dest_location.lng;
     destination.dest_description =
       dest_description || destination.dest_description;
     await destination.save();

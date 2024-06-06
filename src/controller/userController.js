@@ -277,10 +277,6 @@ module.exports.getLoginStatus = async (req, res) => {
 module.exports.getConfirmStatus = async (req, res) => {
   const { email } = req.body;
   const user = await User.find({ email: email });
-  // const verified = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
-  if (!verified) {
-    return res.json({ message: "user does not exist" });
-  }
   return res.json(user);
 };
 module.exports.getCounts = async (req, res) => {
