@@ -111,7 +111,7 @@ module.exports.touristCredential = async (req, res) => {
     await user.save();
     res.json({ message: "user signup successfully", body: user }).status(200);
   } catch (err) {
-    console.log("the error: " + err);
+    console.log("the error: " + err.message);
   }
 };
 
