@@ -275,7 +275,7 @@ module.exports.getLoginStatus = async (req, res) => {
   return res.json(false);
 };
 module.exports.getConfirmStatus = async (req, res) => {
-  const { email } = req.bpdy;
+  const { email } = req.body;
   const user = await User.find({ email: email });
   const verified = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
   if (!verified) {
