@@ -93,7 +93,7 @@ module.exports.updateDestination = async (req, res) => {
     destination.dest_name = dest_name || destination.dest_name;
     destination.dest_image = dest_image;
     destination.dest_location.lat = lat || destination.dest_location.lat;
-    destination.dest_location.lat = lng || destination.dest_location.lng;
+    destination.dest_location.lng = lng || destination.dest_location.lng;
     destination.dest_description =
       dest_description || destination.dest_description;
     await destination.save();
