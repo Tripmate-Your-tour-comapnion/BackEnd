@@ -7,6 +7,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
+  console.log("File MIME type:", file.mimetype);
   // Accept only image files and PDFs
   if (
     file.mimetype.startsWith("image/") ||
@@ -17,6 +18,7 @@ const fileFilter = (req, file, cb) => {
     cb(new Error("Only image and PDF files are allowed"));
   }
 };
+
 
 const upload = multer({
   storage: storage,
