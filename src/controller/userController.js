@@ -281,7 +281,7 @@ module.exports.getConfirmStatus = async (req, res) => {
   if (!verified) {
     return res.json({ message: "user does not exist" });
   }
-  return res.json({ isConfirmed: user.confirmed });
+  return res.json(user);
 };
 module.exports.getCounts = async (req, res) => {
   try {
