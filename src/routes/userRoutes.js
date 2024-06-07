@@ -44,7 +44,7 @@ router.get("/get-single-provider/:id?", getSingleProvider);
 router.get("/get-all-users/", auth_mw, getAllUsers);
 router.get("/get-single-user", auth_mw, getSingleUser);
 router.get("/get-user-info", auth_mw, userInfo);
-router.get("/get-user-with-token/:token", userInfoWithToken);
+router.get("/get-user-with-token/:token?", userInfoWithToken);
 router.put("/verify-user/", auth_mw, verifyUser);
 router.put("/ban-user", auth_mw, banUser);
 router.put("/verify-email/:verifyToken", verifyEmail);

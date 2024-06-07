@@ -399,6 +399,7 @@ module.exports.userInfo = async (req, res) => {
 };
 
 module.exports.userInfoWithToken = async (req, res) => {
+  console.log("enters");
   try {
     console.log("enters");
     const { token } = req.params;
