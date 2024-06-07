@@ -23,18 +23,25 @@ module.exports.getTopRatedHotels = async (req, res) => {
     if (role !== "tourist") {
       return res.json({ message: "You are not allowed to see rooms" });
     }
+
+    // Fetch all rooms
     const rooms = await Room.find({});
+    console.log("Fetched rooms:", rooms);
+
+    // Filter rooms with a rating higher than 4
     const topRatedRooms = rooms.filter((room) => room.room_rate.value > 4);
+    console.log("Top rated rooms:", topRatedRooms);
 
     const hotelOwnerDetails = await Promise.all(
       topRatedRooms.map(async (room) => {
         const hotel = await ProviderProfile.findById(room.owner);
+        console.log(`Fetched hotel for room ${room._id}:`, hotel);
         return hotel
           ? {
-              owner: hotel.owner,
-              hotelName: hotel.full_name,
-              hotelEmail: hotel.email,
-              rating: room.rating,
+              owner: hotel._id,
+              hotelName: hotel.company_name,
+
+              rating: room.room_rate.value,
             }
           : null;
       })
@@ -44,9 +51,11 @@ module.exports.getTopRatedHotels = async (req, res) => {
     const validHotelOwnerDetails = hotelOwnerDetails.filter(
       (detail) => detail !== null
     );
+    console.log("Valid hotel owner details:", validHotelOwnerDetails);
 
     res.json(validHotelOwnerDetails);
   } catch (err) {
+    console.error("Error fetching top-rated hotels:", err.message);
     res.json({ message: err.message });
   }
 };
