@@ -131,11 +131,11 @@ module.exports.Login = async (req, res) => {
 
 module.exports.resendEmail = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { emails } = req.body;
 
     console.log("solomonsssss");
-    console.log(email);
-    const user = await User.findOne({ email: email }); // Use findOne to get a single user object
+    console.log(emails);
+    const user = await User.findOne({ email: emails }); // Use findOne to get a single user object
     if (!user) {
       return res.json({ message: "user does not exist" });
     }
