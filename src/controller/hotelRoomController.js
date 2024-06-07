@@ -1,6 +1,6 @@
 const Room = require("../models/hotelRoomModel");
 const User = require("../models/userModel");
-
+const Provider = require("../models/providerProfileModel");
 const cloudinary = require("../utils/cloudinary");
 
 module.exports.getAllRooms = async (req, res) => {
@@ -11,6 +11,40 @@ module.exports.getAllRooms = async (req, res) => {
     }
     const rooms = await Room.find({}).populate("owner");
     res.json({ message: rooms }).status(200);
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+module.exports.getTopRatedHotels = async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (role !== "tourist") {
+      return res.json({ message: "You are not allowed to see rooms" });
+    }
+    const rooms = await Room.find({});
+    const topRatedRooms = rooms.filter((room) => room.room_rate.value > 4);
+
+    const hotelOwnerDetails = await Promise.all(
+      topRatedRooms.map(async (room) => {
+        const hotel = await Provider.findById(room.owner);
+        return hotel
+          ? {
+              owner: hotel.owner,
+              hotelName: hotel.full_name,
+              hotelEmail: hotel.email,
+              rating: room.rating,
+            }
+          : null;
+      })
+    );
+
+    // Remove null values in case some hotels were not found
+    const validHotelOwnerDetails = hotelOwnerDetails.filter(
+      (detail) => detail !== null
+    );
+
+    res.json(validHotelOwnerDetails);
   } catch (err) {
     res.json({ message: err.message });
   }
