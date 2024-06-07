@@ -29,7 +29,7 @@ module.exports.chapaPayment = async (req, res, next) => {
       currency: "ETB",
       callback_url:
         "https://web-tourism-management-backend-final.onrender.com/reservation/confirm-payment",
-      return_url: "http://localhost:5173/thanks",
+      return_url: "https://tourism-management-front.vercel.app/thanks",
       "subaccounts[id]": sub_id,
     };
     const response = await axios.post(
