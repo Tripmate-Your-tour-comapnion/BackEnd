@@ -38,10 +38,7 @@ module.exports.getTopRatedHotels = async (req, res) => {
         console.log(`Fetched hotel for room ${room._id}:`, hotel);
         return hotel
           ? {
-              owner: hotel._id,
-              hotelName: hotel.company_name,
-
-              rating: room.room_rate.value,
+              hotel,
             }
           : null;
       })

@@ -133,9 +133,14 @@ module.exports.resendEmail = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.find({ email: email });
-    let vtoken = await Token.findOne({ userId: user._id });
-    if (vtoken) {
-      await vtoken.deleteOne();
+    if (!user) {
+      return res.json({ message: "user do not exist" });
+    }
+    console.log("user is " + user);
+    let token = await Token.findOne({ userId: user._id });
+    console.log("token is " + token);
+    if (token) {
+      await token.deleteOne();
     }
     let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
     console.log(verifyToken);
