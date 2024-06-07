@@ -1,4 +1,6 @@
 const Room = require("../models/hotelRoomModel");
+const Users = require("../models/userModel");
+
 const cloudinary = require("../utils/cloudinary");
 
 module.exports.getAllRooms = async (req, res) => {
