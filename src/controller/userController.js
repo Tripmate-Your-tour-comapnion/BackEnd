@@ -133,10 +133,7 @@ module.exports.resendEmail = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.find({ email: email });
-    let vtoken = await Token.find({ userId: user._id });
-    if (vtoken) {
-      await vtoken.deleteOne();
-    }
+    await Token.deleteMany({ userId: user._id });
     let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
     console.log(verifyToken);
     const hashedToken = crypto
