@@ -10,6 +10,7 @@ const ProviderProfile = require("../models/providerProfileModel");
 const TouristProfile = require("../models/touristProfileModel");
 const Reservations = require("../models/reservationModel");
 const Subscriptions = require("../models/subscriptionModel");
+const Purchase = require("../models/purchaseModel");
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
