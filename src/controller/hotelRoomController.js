@@ -36,7 +36,7 @@ module.exports.getTopRatedHotels = async (req, res) => {
       topRatedRooms.map(async (room) => {
         const hotel = await ProviderProfile.findById(room.owner);
         console.log(`Fetched hotel for room ${room._id}:`, hotel);
-        return hotel ? hotel : null;
+        return hotel;
       })
     );
 
