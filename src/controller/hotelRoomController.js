@@ -176,9 +176,9 @@ module.exports.deleteRoom = async (req, res) => {
     if (role != "hotel manager") {
       return res.json({ message: "you are not allowed to delete rooms" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to delete rooms" });
-    }
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to delete rooms" });
+    // }
     const room = await Room.findById(rid);
     if (room.owner != req.user.id) {
       return res.json({ message: "you are only allowed to update your rooms" });

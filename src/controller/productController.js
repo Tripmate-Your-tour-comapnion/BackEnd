@@ -180,14 +180,14 @@ module.exports.updateProduct = async (req, res) => {
 
 module.exports.deleteProduct = async (req, res) => {
   try {
-    const { role, id, status } = req.user;
+    const { role, id, } = req.user;
     const pid = req.params.id;
     if (role != "shop owner") {
       return res.json({ message: "you are not allowed to delete product" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to delete product" });
-    }
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to delete product" });
+    // }
     const product = await Product.findById(pid);
     if (!product) return res.status(404).send("product not found");
     if (product.shop_owner != id) {

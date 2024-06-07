@@ -175,14 +175,14 @@ module.exports.updatePackage = async (req, res) => {
 
 module.exports.deletePackage = async (req, res) => {
   try {
-    const { role, id, status } = req.user;
+    const { role, id } = req.user;
     const pid = req.params.id;
     if (role != "tour guide") {
       return res.json({ message: "you are not allowed to delete Tours" });
     }
-    if (status != "verified") {
-      return res.json({ message: "you must be verified to delete Tours" });
-    }
+    // if (status != "verified") {
+    //   return res.json({ message: "you must be verified to delete Tours" });
+    // }
     const tour = await Tours.findById(pid);
     if (tour.agent != id) {
       return res.json({ message: "you are only allowed to delete your Tours" });
