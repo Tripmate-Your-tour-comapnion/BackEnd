@@ -132,18 +132,24 @@ module.exports.Login = async (req, res) => {
 module.exports.resendEmail = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.find({ email: email });
+    const user = await User.findOne({ email: email }); // Use findOne to get a single user object
+
     if (!user) {
-      return res.json({ message: "user do not exist" });
+      return res.json({ message: "user does not exist" });
     }
+
     console.log("user is " + user);
-    let token = await Token.findOne({userId: user._id });
+
+    let token = await Token.findOne({ userId: user._id });
     console.log("token is " + token);
+
     if (token) {
       await token.deleteOne();
     }
+
     let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
     console.log(verifyToken);
+
     const hashedToken = crypto
       .createHash("sha256")
       .update(verifyToken)
@@ -156,16 +162,15 @@ module.exports.resendEmail = async (req, res) => {
       createdAt: Date.now(),
       expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
     }).save();
+
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${verifyToken}`;
     const message = `
-  <h2>Hello ${user.full_name}</h2>
-  <p>Please use the url below to confirm your Email</p>  
-
-  <a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
-
-  <p>Regards...</p>
-  <p>Tripmate Team</p>
-`;
+      <h2>Hello ${user.full_name}</h2>
+      <p>Please use the url below to confirm your Email</p>  
+      <a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
+      <p>Regards...</p>
+      <p>Tripmate Team</p>
+    `;
     const subject = "Account Verification Request";
     const send_to = user.email;
     console.log(send_to);
@@ -173,9 +178,14 @@ module.exports.resendEmail = async (req, res) => {
     console.log(sent_from);
 
     await sendEmail(subject, message, send_to, sent_from);
+
     res
-      .json({ body: user, success: true, message: "Verification Email Resent" })
-      .status(200);
+      .status(200)
+      .json({
+        body: user,
+        success: true,
+        message: "Verification Email Resent",
+      });
   } catch (err) {
     console.log(err.message);
     res.json({ message: err.message });
