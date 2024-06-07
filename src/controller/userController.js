@@ -165,7 +165,7 @@ module.exports.resendEmail = async (req, res) => {
       expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
     }).save();
 
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${verifyToken}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user-resend/${verifyToken}`;
     const message = `
       <h2>Hello ${user.full_name}</h2>
       <p>Please use the url below to confirm your Email</p>  
