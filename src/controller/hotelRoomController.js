@@ -2,6 +2,7 @@ const Room = require("../models/hotelRoomModel");
 const User = require("../models/userModel");
 const Provider = require("../models/providerProfileModel");
 const cloudinary = require("../utils/cloudinary");
+const ProviderProfile = require("../models/providerProfileModel");
 
 module.exports.getAllRooms = async (req, res) => {
   try {
@@ -27,7 +28,7 @@ module.exports.getTopRatedHotels = async (req, res) => {
 
     const hotelOwnerDetails = await Promise.all(
       topRatedRooms.map(async (room) => {
-        const hotel = await Provider.findById(room.owner);
+        const hotel = await ProviderProfile.findById(room.owner);
         return hotel
           ? {
               owner: hotel.owner,
