@@ -20,6 +20,7 @@ const {
   searchShop,
   verifyEmail,
   getConfirmStatus,
+  getMyActivity,
 } = require("../controller/userController");
 const auth_mw = require("../middleware/auth_mw");
 
@@ -44,5 +45,6 @@ router.get("/get-user-info", auth_mw, userInfo);
 router.put("/verify-user/", auth_mw, verifyUser);
 router.put("/ban-user", auth_mw, banUser);
 router.put("/verify-email/:verifyToken", verifyEmail);
+router.get("/get-my-activity", auth_mw, getMyActivity);
 
 module.exports = router;

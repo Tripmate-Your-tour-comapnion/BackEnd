@@ -529,3 +529,45 @@ module.exports.verifyEmail = async (req, res) => {
     message: "Email confirmation successful",
   });
 };
+module.exports.getMyActivity = async (req, res) => {
+  try {
+    const { role, id } = req.user;
+    // console.log("User Info:", req.user);
+
+    if (role !== "tourist") {
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to see Activities" });
+    }
+
+    const reservations = await Reservations.find({ customer: id })
+      .populate("hotel")
+      .populate("room");
+
+    const purchases = await Purchase.find({ customer: id })
+      .populate("shop")
+      .populate("product");
+
+    const subscriptions = await Subscriptions.find({ customer: id })
+      .populate("agency")
+      .populate("package");
+
+    if (
+      (!reservations || reservations.length === 0) &&
+      (!purchases || purchases.length === 0) &&
+      (!subscriptions || subscriptions.length === 0)
+    ) {
+      console.log("No activities found for user:", id);
+      return res.status(404).json({ message: "No activities found" });
+    }
+
+    res.status(200).json({
+      reservations: reservations,
+      purchases: purchases,
+      subscriptions: subscriptions,
+    });
+  } catch (err) {
+    console.error("Error fetching activities:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

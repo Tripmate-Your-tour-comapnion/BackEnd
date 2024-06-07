@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.get("/get-all", auth_mw, getAllReservations);
 router.get("/get-my-reservation", auth_mw, getMyReservations);
+
 // router.post("/reserve-room", auth_mw,request,chapaPayment,verify);
 router.post("/reserve-room/:rid?", auth_mw, reserveRoom, chapaPayment);
 // router.post("/reserve-room/:rid?", reserveRoom, chapaPayment);
