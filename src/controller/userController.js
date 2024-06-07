@@ -132,8 +132,10 @@ module.exports.Login = async (req, res) => {
 module.exports.resendEmail = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email }); // Use findOne to get a single user object
 
+    console.log("solomonsssss");
+    console.log(email);
+    const user = await User.findOne({ email: email }); // Use findOne to get a single user object
     if (!user) {
       return res.json({ message: "user does not exist" });
     }
@@ -179,13 +181,11 @@ module.exports.resendEmail = async (req, res) => {
 
     await sendEmail(subject, message, send_to, sent_from);
 
-    res
-      .status(200)
-      .json({
-        body: user,
-        success: true,
-        message: "Verification Email Resent",
-      });
+    res.status(200).json({
+      body: user,
+      success: true,
+      message: "Verification Email Resent",
+    });
   } catch (err) {
     console.log(err.message);
     res.json({ message: err.message });
