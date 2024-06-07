@@ -129,6 +129,54 @@ module.exports.Login = async (req, res) => {
   }
 };
 
+module.exports.resendEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.find({ email: email });
+    let vtoken = await Token.findOne({ userId: user._id });
+    if (vtoken) {
+      await vtoken.deleteOne();
+    }
+    let verifyToken = crypto.randomBytes(32).toString("hex") + user._id;
+    console.log(verifyToken);
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verifyToken)
+      .digest("hex");
+
+    // Save Token to DB
+    await new Token({
+      userId: user._id,
+      token: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 15 * (60 * 1000), // Thirty minutes
+    }).save();
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-user/${verifyToken}`;
+    const message = `
+  <h2>Hello ${user.full_name}</h2>
+  <p>Please use the url below to confirm your Email</p>  
+
+  <a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
+
+  <p>Regards...</p>
+  <p>Tripmate Team</p>
+`;
+    const subject = "Account Verification Request";
+    const send_to = user.email;
+    console.log(send_to);
+    const sent_from = process.env.EMAIL_USER;
+    console.log(sent_from);
+
+    await sendEmail(subject, message, send_to, sent_from);
+    res
+      .json({ body: user, success: true, message: "Verification Email Resent" })
+      .status(200);
+  } catch (err) {
+    console.log(err.message);
+    res.json({ message: err.message });
+  }
+};
+
 module.exports.logout = async (req, res) => {
   res.cookie("token", "", {
     path: "/",
@@ -345,6 +393,18 @@ module.exports.userInfo = async (req, res) => {
       return res.json({ message: "user does not exist" });
     }
     return res.json({ message: user });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+};
+
+module.exports.userInfoWithToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const users = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
+    console.log("id is: " + users.id);
+    const user = await User.findById(users.id);
+    return res.json(user);
   } catch (err) {
     res.json({ message: err.message });
   }

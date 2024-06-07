@@ -7,7 +7,7 @@ module.exports.getAllRooms = async (req, res) => {
     if (role != "tourist") {
       return res.json({ message: "you are not allowed to see rooms" });
     }
-    const rooms = await Room.find({});
+    const rooms = await Room.find({}).populate("owner");
     res.json({ message: rooms }).status(200);
   } catch (err) {
     res.json({ message: err.message });
@@ -47,7 +47,7 @@ module.exports.getAllRoomsOfOneHotel = async (req, res) => {
   } catch (err) {
     res.json({ message: err.message });
   }
-}
+};
 module.exports.getMyRooms = async (req, res) => {
   try {
     const { role, id } = req.user;
@@ -203,7 +203,8 @@ module.exports.rateRoom = async (req, res) => {
       return res.json({ message: "room does not exist" });
     }
     room.room_rate.total += rate;
-    room.room_rate.value = room.room_rate.total / (room.room_rate.rater_number + 1);
+    room.room_rate.value =
+      room.room_rate.total / (room.room_rate.rater_number + 1);
     room.room_rate.rater_number += 1;
     await room.save();
     return res.json({ body: room }).status(200);
