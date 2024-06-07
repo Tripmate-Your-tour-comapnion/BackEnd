@@ -133,7 +133,7 @@ module.exports.resendEmail = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.find({ email: email });
-    let vtoken = await Token.findOne({ userId: user._id });
+    let vtoken = await Token.find({ userId: user._id });
     if (vtoken) {
       await vtoken.deleteOne();
     }
