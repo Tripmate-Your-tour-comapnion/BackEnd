@@ -431,16 +431,35 @@ module.exports.getSingleUser = async (req, res) => {
 module.exports.searchHotel = async (req, res) => {
   try {
     const { key } = req.params;
-    const hotel = await User.find({ role: "hotel manager" }).select("_id");
+
+    // Get hotel managers' IDs along with verification_status
+    const hotelManagers = await User.find({ role: "hotel manager" })
+                                    .select("_id verification_status");
+
+    // Extract hotel manager IDs
+    const hotelManagerIds = hotelManagers.map(manager => manager._id);
+
+    // Find hotels with matching company name and manager ID in the list
     const hotels = await ProviderProfile.find({
       company_name: { $regex: new RegExp(key, "i") },
-      _id: { $in: hotel },
+      _id: { $in: hotelManagerIds },
     });
-    res.json(hotels).status(200);
+
+    // Combine hotels with their corresponding verification status
+    const hotelsWithStatus = hotels.map(hotel => {
+      const manager = hotelManagers.find(manager => manager._id.equals(hotel._id));
+      return {
+        ...hotel._doc, // Spread the hotel object
+        verification_status: manager ? manager.verification_status : null, // Add verification_status
+      };
+    });
+
+    res.status(200).json(hotelsWithStatus);
   } catch (err) {
-    res.json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
+
 module.exports.searchShop = async (req, res) => {
   try {
     const { key } = req.params;
