@@ -54,7 +54,7 @@ module.exports.getMyPackages = async (req, res) => {
   try {
     const { role, id } = req.user;
 
-    if (role != "tour guide") {
+    if (role !== "tour guide") {
       return res.json({ message: "you are not allowed to see Tours" });
     }
     const tours = await Tours.find({ agent: id });

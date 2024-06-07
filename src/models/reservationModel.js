@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const User = require("./userModel");
 const Rooms = require("./hotelRoomModel");
 const reservationSchema = new mongoose.Schema({
+  customer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   hotel: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -12,10 +16,7 @@ const reservationSchema = new mongoose.Schema({
     required: true,
     ref: "Rooms",
   },
-  customer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
+
   tx_ref: {
     type: String,
     required: true,
