@@ -400,12 +400,16 @@ module.exports.userInfo = async (req, res) => {
 
 module.exports.userInfoWithToken = async (req, res) => {
   try {
+    console.log("enters");
     const { token } = req.params;
+    console.log("token :" + token);
     const users = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
     console.log("id is: " + users.id);
     const user = await User.findById(users.id);
+    console.log("user is: " + user);
     return res.json(user);
   } catch (err) {
+    console.log("error is: " + err.message);
     res.json({ message: err.message });
   }
 };
