@@ -82,7 +82,7 @@ module.exports.signup = async (req, res) => {
         sameSite: "none",
         secure: true,
       })
-      .json({ body: user, success: true, message: "Verify Email Sent" })
+      .json({ body: user, success: true, message: "Verification Email Sent" })
       .status(200);
   } catch (err) {
     console.log(err.message);
