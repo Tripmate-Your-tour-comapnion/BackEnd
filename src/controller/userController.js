@@ -137,7 +137,7 @@ module.exports.resendEmail = async (req, res) => {
       return res.json({ message: "user do not exist" });
     }
     console.log("user is " + user);
-    let token = await Token.findOne({ userId: user._id });
+    let token = await Token.findOne({userId: user._id });
     console.log("token is " + token);
     if (token) {
       await token.deleteOne();
