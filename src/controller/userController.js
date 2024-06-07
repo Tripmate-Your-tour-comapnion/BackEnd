@@ -505,7 +505,8 @@ module.exports.verifyEmail = async (req, res) => {
   user.confirmed = true;
   await user.save();
   res.status(200).json({
+    status: true,
     body: user,
-    message: "Email confirmation successful, Please Login",
+    message: "Email confirmation successful",
   });
 };
