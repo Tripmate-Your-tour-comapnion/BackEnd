@@ -29,7 +29,7 @@ module.exports.getTopRatedHotels = async (req, res) => {
     console.log("Fetched rooms:", rooms);
 
     // Filter rooms with a rating higher than 4
-    const topRatedRooms = rooms.filter((room) => room.room_rate.value > 4);
+    const topRatedRooms = rooms.filter((room) => room.room_rate.value > 3);
     console.log("Top rated rooms:", topRatedRooms);
 
     const hotelOwnerDetails = await Promise.all(
