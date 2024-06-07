@@ -402,7 +402,7 @@ module.exports.userInfoWithToken = async (req, res) => {
   console.log("enters");
   try {
     console.log("enters");
-    const { token } = req.params;
+    const { token } = req.body;
     console.log("token :" + token);
     const users = jwt.verify(token, process.env.PRIVATE_SECERET_TOKEN);
     console.log("id is: " + users.id);
